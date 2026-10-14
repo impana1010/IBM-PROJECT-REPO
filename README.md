@@ -190,3 +190,8 @@ DEBUG=true
 
 All product names, prices, specifications, reviews, and price histories are **fabricated for
 demonstration purposes only**. This project is not affiliated with any of the brands mentioned.
+
+
+## 🚀 Live Prototype
+
+[Click here to open SmartCart AI](https://thriving-puffpuff-df0f9b.netlify.app)
