@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>SmartCart AI — Intelligent Shopping Agent</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,sans-serif;background:#f8fafc;color:#1e293b;font-size:14px;line-height:1.5}
+.sidebar{position:fixed;top:36px;left:0;width:220px;height:calc(100vh - 36px);background:#fff;border-right:1px solid #e2e8f0;display:flex;flex-direction:column;z-index:100;overflow-y:auto}
+.main{margin-left:220px;padding:24px;padding-top:58px;min-height:100vh}
+.nav-item{display:flex;align-items:center;gap:9px;padding:8px 14px;border-radius:8px;cursor:pointer;font-size:13px;color:#64748b;transition:.15s;margin-bottom:2px}
+.nav-item:hover{background:#f1f5f9;color:#1e293b}
+.nav-item.active{background:#eff6ff;color:#2563eb;font-weight:600}
+.card{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:18px}
+.btn{display:inline-flex;align-items:center;gap:6px;border:none;border-radius:8px;padding:8px 16px;font-weight:600;cursor:pointer;font-size:13px;transition:.15s}
+.btn-p{background:#3b82f6;color:#fff}.btn-p:hover{background:#2563eb}
+.btn-s{background:#f1f5f9;color:#1e293b}.btn-s:hover{background:#e2e8f0}
+.page{display:none}.page.active{display:block}
+.input{width:100%;border:1px solid #e2e8f0;border-radius:8px;padding:8px 11px;font-size:13px;outline:none;background:#fff}
+.input:focus{border-color:#3b82f6;box-shadow:0 0 0 3px rgba(59,130,246,.1)}
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:300;align-items:flex-start;justify-content:center;padding:48px 16px;overflow-y:auto}
+.modal-bg.open{display:flex}
+.modal-inner{background:#fff;border-radius:14px;padding:24px;max-width:660px;width:100%;margin-bottom:40px}
+.demo-bar{background:#fef3c7;border-bottom:1px solid #fde68a;padding:7px 20px;text-align:center;font-size:12px;color:#92400e;position:fixed;top:0;left:0;right:0;z-index:400;font-weight:500}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.g4{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:14px}
+.pbar{height:6px;background:#e2e8f0;border-radius:3px;overflow:hidden}
+.pfill{height:100%;border-radius:3px;transition:.3s}
+.chat-msg{margin:8px 0;display:flex;gap:8px}
+.chat-msg.user{flex-direction:row-reverse}
+.bubble{max-width:75%;padding:10px 14px;border-radius:10px;font-size:13px;line-height:1.55}
+.bubble.user{background:#3b82f6;color:#fff;border-radius:10px 10px 2px 10px}
+.bubble.bot{background:#fff;border:1px solid #e2e8f0;color:#1e293b;border-radius:10px 10px 10px 2px}
+#toast{position:fixed;bottom:20px;right:20px;z-index:500;display:flex;flex-direction:column;gap:7px;pointer-events:none}
+select.input{padding:7px 10px}
+@media(max-width:768px){.sidebar{display:none}.main{margin-left:0;padding:14px;padding-top:52px}}
+</style>
+</head>
+<body>
+<div class="demo-bar">&#9889; Demo Mode Active &mdash; SmartCart AI &nbsp;|&nbsp; Synthetic product data &nbsp;|&nbsp; IBM watsonx.ai not connected. Set IBM_WATSONX_API_KEY in .env to enable live AI.</div>
+<aside class="sidebar">
+  <div style="padding:14px;border-bottom:1px solid #e2e8f0">
+    <div style="display:flex;align-items:center;gap:8px">
+      <div style="width:30px;height:30px;background:#3b82f6;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px">🛒</div>
+      <div><div style="font-weight:700;font-size:13.5px">SmartCart AI</div><div style="font-size:10.5px;color:#94a3b8">Shop Smarter. Save More.</div></div>
+    </div>
+  </div>
+  <nav style="padding:8px;flex:1">
+    <div class="nav-item active" onclick="nav('dashboard',this)">🏠&nbsp; Dashboard</div>
+    <div class="nav-item" onclick="nav('search',this)">🔍&nbsp; AI Search</div>
+    <div class="nav-item" onclick="nav('compare',this)">⚖️&nbsp; Compare</div>
+    <div class="nav-item" onclick="nav('assistant',this)">💬&nbsp; AI Assistant</div>
+    <div class="nav-item" onclick="nav('tracker',this)">📉&nbsp; Price Tracker</div>
+    <div class="nav-item" onclick="nav('reviews',this)">⭐&nbsp; Reviews</div>
+    <div class="nav-item" onclick="nav('pulse',this)">📊&nbsp; Shopping Pulse</div>
+    <div class="nav-item" onclick="nav('list',this)">📋&nbsp; My List</div>
+    <div class="nav-item" onclick="nav('settings',this)">⚙️&nbsp; Settings</div>
+  </nav>
+  <div style="padding:10px 14px;border-top:1px solid #e2e8f0;font-size:10.5px;color:#94a3b8">v1.0.0 &mdash; Demo Mode</div>
+</aside>
+<main class="main">
+
+<!-- DASHBOARD -->
+<div id="pg-dashboard" class="page active">
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px;margin-bottom:20px">
+    <div><h1 style="font-size:20px;font-weight:700">Good morning, Shopper &#128075;</h1><div style="color:#64748b;font-size:12.5px" id="dateStr"></div></div>
+    <span style="background:#fef3c7;color:#92400e;font-size:11px;font-weight:600;padding:3px 9px;border-radius:999px">&#9889; Demo Mode Active</span>
+  </div>
+  <div class="card" style="margin-bottom:16px">
+    <div style="font-size:11px;text-transform:uppercase;letter-spacing:.8px;color:#94a3b8;margin-bottom:7px;font-weight:600">AI Product Search</div>
+    <div style="display:flex;gap:8px">
+      <input class="input" id="dashQ" placeholder='Try: "best 5G phone under ₹25,000"' style="flex:1" onkeydown="if(event.key==='Enter')dashGo()"/>
+      <button class="btn btn-p" onclick="dashGo()">Search</button>
+    </div>
+  </div>
+  <div class="g3" style="margin-bottom:16px" id="statsRow"></div>
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+    <h2 style="font-size:15px;font-weight:700">🔥 Trending Products</h2>
+    <span style="background:#f1f5f9;color:#64748b;font-size:11px;font-weight:600;padding:3px 8px;border-radius:999px">Demo Data</span>
+  </div>
+  <div class="g4" id="trendGrid" style="margin-bottom:20px"></div>
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+    <h2 style="font-size:15px;font-weight:700">⭐ Recommended for You</h2>
+    <span style="background:#eff6ff;color:#2563eb;font-size:11px;font-weight:600;padding:3px 8px;border-radius:999px">AI Picks &mdash; Demo</span>
+  </div>
+  <div class="g4" id="recGrid"></div>
+</div>
+
+<!-- SEARCH -->
+<div id="pg-search" class="page">
+  <h1 style="font-size:20px;font-weight:700;margin-bottom:16px">🔍 AI Product Search</h1>
+  <div class="card" style="margin-bottom:14px">
+    <div style="display:flex;gap:8px;margin-bottom:10px">
+      <input class="input" id="searchQ" placeholder='e.g. "best laptop under ₹50,000 for programming"' style="flex:1" onkeydown="if(event.key==='Enter')doSearch()"/>
+      <button class="btn btn-p" onclick="doSearch()">Search</button>
+    </div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
+      <span style="font-size:12px;color:#64748b">Try:</span>
+      <button class="btn btn-s" style="padding:3px 9px;font-size:11.5px" onclick="qs('5G smartphone under 25000')">📱 5G Phone ₹25K</button>
+      <button class="btn btn-s" style="padding:3px 9px;font-size:11.5px" onclick="qs('laptop programming')">💻 Dev Laptop</button>
+      <button class="btn btn-s" style="padding:3px 9px;font-size:11.5px" onclick="qs('noise cancelling headphones')">🎧 ANC Headphones</button>
+      <button class="btn btn-s" style="padding:3px 9px;font-size:11.5px" onclick="qs('smartwatch fitness')">⌚ Fitness Watch</button>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:210px 1fr;gap:16px;align-items:start">
+    <div class="card">
+      <div style="font-weight:600;margin-bottom:12px">Filters</div>
+      <label style="font-size:11.5px;font-weight:600;color:#64748b;display:block;margin-bottom:4px">Category</label>
+      <select class="input" id="fCat" onchange="applyF()" style="margin-bottom:10px">
+        <option value="">All Categories</option>
+        <option value="smartphones">📱 Smartphones</option>
+        <option value="laptops">💻 Laptops</option>
+        <option value="headphones">🎧 Headphones</option>
+        <option value="smartwatches">⌚ Smartwatches</option>
+        <option value="home_appliances">🏠 Home Appliances</option>
+      </select>
+      <label style="font-size:11.5px;font-weight:600;color:#64748b;display:block;margin-bottom:4px">Max Price (₹)</label>
+      <input class="input" type="number" id="fMax" placeholder="e.g. 30000" onchange="applyF()" style="margin-bottom:10px"/>
+      <label style="font-size:11.5px;font-weight:600;color:#64748b;display:block;margin-bottom:4px">Min Rating</label>
+      <select class="input" id="fRating" onchange="applyF()" style="margin-bottom:10px">
+        <option value="">Any Rating</option>
+        <option value="4">4★ &amp; above</option>
+        <option value="4.3">4.3★ &amp; above</option>
+        <option value="4.5">4.5★ &amp; above</option>
+      </select>
+      <label style="font-size:11.5px;font-weight:600;color:#64748b;display:block;margin-bottom:4px">Sort By</label>
+      <select class="input" id="fSort" onchange="applyF()" style="margin-bottom:12px">
+        <option value="val">Value Score</option>
+        <option value="pa">Price ↑</option>
+        <option value="pd">Price ↓</option>
+        <option value="rating">Rating</option>
+        <option value="disc">Discount %</option>
+      </select>
+      <button class="btn btn-s" style="width:100%;font-size:12px" onclick="clearF()">✕ Clear Filters</button>
+    </div>
+    <div>
+      <div id="searchMeta" style="font-size:12.5px;color:#64748b;margin-bottom:10px"></div>
+      <div class="g4" id="searchResults"></div>
+    </div>
+  </div>
+</div>
+
+<!-- COMPARE -->
+<div id="pg-compare" class="page">
+  <h1 style="font-size:20px;font-weight:700;margin-bottom:6px">⚖️ Product Comparison</h1>
+  <p style="color:#64748b;font-size:13px;margin-bottom:16px">Add up to 4 products to compare side-by-side.</p>
+  <div class="card" style="margin-bottom:14px">
+    <div style="font-weight:600;margin-bottom:9px">Add Product to Compare</div>
+    <div style="position:relative;display:inline-block">
+      <input class="input" id="cmpQ" placeholder="Type product name..." oninput="cmpSug()" style="width:360px"/>
+      <div id="cmpSugBox" style="position:absolute;top:100%;left:0;z-index:50;width:360px"></div>
+    </div>
+    <div id="cmpChips" style="display:flex;gap:7px;flex-wrap:wrap;margin-top:10px"></div>
+  </div>
+  <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:14px">
+    <span style="font-size:13px;font-weight:600">Priority:</span>
+    <button class="btn btn-s" id="pr-val" onclick="setPrio('val')" style="font-size:12px;padding:5px 11px">💰 Best Value</button>
+    <button class="btn btn-s" id="pr-qual" onclick="setPrio('qual')" style="font-size:12px;padding:5px 11px">🏆 Best Quality</button>
+    <button class="btn btn-s" id="pr-price" onclick="setPrio('price')" style="font-size:12px;padding:5px 11px">🏷️ Lowest Price</button>
+    <button class="btn btn-s" id="pr-sust" onclick="setPrio('sust')" style="font-size:12px;padding:5px 11px">🌿 Sustainability</button>
+    <button class="btn btn-p" onclick="runCmp()" style="margin-left:auto">Compare Now</button>
+  </div>
+  <div id="cmpTable"></div>
+  <div id="cmpSummary" style="display:none;margin-top:14px" class="card"></div>
+</div>
+
+<!-- ASSISTANT -->
+<div id="pg-assistant" class="page">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+    <div><h1 style="font-size:20px;font-weight:700;margin:0">💬 AI Shopping Assistant</h1>
+    <p style="color:#64748b;font-size:12.5px;margin-top:2px">Powered by local demo engine &mdash; IBM watsonx.ai not connected.</p></div>
+    <button class="btn btn-s" onclick="clearChat()" style="font-size:12px">Clear Chat</button>
+  </div>
+  <div class="card" style="margin-bottom:10px">
+    <div style="font-size:11.5px;font-weight:600;color:#64748b;margin-bottom:7px">Suggested Prompts</div>
+    <div style="display:flex;gap:5px;flex-wrap:wrap">
+      <button class="btn btn-s" style="font-size:11.5px;padding:4px 9px" onclick="sendMsg('Best 5G smartphone under 25000')">📱 5G phone ₹25K</button>
+      <button class="btn btn-s" style="font-size:11.5px;padding:4px 9px" onclick="sendMsg('Best laptop for programming under 60000')">💻 Dev laptop ₹60K</button>
+      <button class="btn btn-s" style="font-size:11.5px;padding:4px 9px" onclick="sendMsg('Eco-friendly product recommendations')">🌿 Eco picks</button>
+      <button class="btn btn-s" style="font-size:11.5px;padding:4px 9px" onclick="sendMsg('Should I buy now or wait for a sale')">⏰ Buy now or wait?</button>
+      <button class="btn btn-s" style="font-size:11.5px;padding:4px 9px" onclick="sendMsg('Best noise cancelling headphones')">🎧 ANC headphones</button>
+    </div>
+  </div>
+  <div class="card" style="display:flex;flex-direction:column;height:460px">
+    <div id="chatBox" style="flex:1;overflow-y:auto;padding:4px 0"></div>
+    <div style="display:flex;gap:8px;padding-top:10px;border-top:1px solid #e2e8f0;margin-top:8px">
+      <input class="input" id="chatIn" placeholder="Ask me anything..." onkeydown="if(event.key==='Enter')sendChat()"/>
+      <button class="btn btn-p" onclick="sendChat()">Send</button>
+    </div>
+  </div>
+</div>
+
+<!-- TRACKER -->
+<div id="pg-tracker" class="page">
+  <h1 style="font-size:20px;font-weight:700;margin-bottom:16px">📉 Price Tracker &amp; Deal Predictor</h1>
+  <div class="card" style="margin-bottom:14px">
+    <div style="font-weight:600;margin-bottom:10px">Track a Product</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end">
+      <div style="flex:1;min-width:200px">
+        <label style="font-size:11.5px;color:#64748b;display:block;margin-bottom:4px">Select Product</label>
+        <select class="input" id="trkSel"></select>
+      </div>
+      <div>
+        <label style="font-size:11.5px;color:#64748b;display:block;margin-bottom:4px">Target Price (₹)</label>
+        <input class="input" type="number" id="trkTarget" placeholder="e.g. 20000" style="width:150px"/>
+      </div>
+      <button class="btn btn-p" onclick="addTrack()">+ Track</button>
+    </div>
+  </div>
+  <div id="trkList"></div>
+</div>
+
+<!-- REVIEWS -->
+<div id="pg-reviews" class="page">
+  <h1 style="font-size:20px;font-weight:700;margin-bottom:14px">⭐ Review Intelligence</h1>
+  <div style="display:flex;gap:10px;align-items:center;margin-bottom:16px;flex-wrap:wrap">
+    <select class="input" id="revSel" onchange="loadRev()" style="max-width:340px">
+      <option value="">Select a product to analyze...</option>
+    </select>
+    <span style="background:#fef3c7;color:#92400e;font-size:11px;font-weight:600;padding:3px 9px;border-radius:999px">Sample Reviews &mdash; Demo Data</span>
+  </div>
+  <div id="revContent"><div class="card" style="color:#94a3b8;text-align:center;padding:40px">Select a product above to see review analysis.</div></div>
+</div>
+
+<!-- PULSE -->
+<div id="pg-pulse" class="page">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px">
+    <h1 style="font-size:20px;font-weight:700;margin:0">📊 Smart Shopping Pulse</h1>
+    <span style="background:#fef3c7;color:#92400e;font-size:11px;font-weight:600;padding:3px 9px;border-radius:999px">Demo Data &mdash; Synthetic Catalog</span>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:18px">
+    <div class="card" style="text-align:center"><div style="font-size:22px;font-weight:700;color:#3b82f6">25</div><div style="font-size:12px;color:#64748b">Products</div></div>
+    <div class="card" style="text-align:center"><div style="font-size:22px;font-weight:700;color:#10b981">5</div><div style="font-size:12px;color:#64748b">Categories</div></div>
+    <div class="card" style="text-align:center"><div style="font-size:22px;font-weight:700;color:#7c3aed">59</div><div style="font-size:12px;color:#64748b">Avg Sustainability</div></div>
+    <div class="card" style="text-align:center"><div style="font-size:22px;font-weight:700;color:#f59e0b">&#8377;3.8L</div><div style="font-size:12px;color:#64748b">Savings Potential</div></div>
+  </div>
+  <div class="g2" style="margin-bottom:14px">
+    <div class="card"><div style="font-weight:600;margin-bottom:12px">Products by Category</div><div id="pulCat"></div></div>
+    <div class="card"><div style="font-weight:600;margin-bottom:12px">Avg Price by Category</div><div id="pulPrice"></div></div>
+  </div>
+  <div class="card" style="margin-bottom:14px"><div style="font-weight:600;margin-bottom:12px">Top 8 by Value Score</div><div id="pulVal"></div></div>
+  <div class="card"><div style="font-weight:600;margin-bottom:12px">Sustainability Distribution</div><div id="pulSust"></div></div>
+</div>
+
+<!-- SHOPPING LIST -->
+<div id="pg-list" class="page">
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px;margin-bottom:16px">
+    <h1 style="font-size:20px;font-weight:700;margin:0">📋 My Shopping List</h1>
+    <div style="display:flex;align-items:center;gap:7px">
+      <label style="font-size:12.5px;font-weight:600;color:#64748b">Budget: &#8377;</label>
+      <input class="input" type="number" id="budgetIn" value="100000" onchange="renderList()" style="width:120px"/>
+    </div>
+  </div>
+  <div class="g3" style="margin-bottom:16px">
+    <div class="card" style="text-align:center"><div style="font-size:11px;color:#64748b">Estimated Total</div><div style="font-size:18px;font-weight:700" id="lTotal">&#8377;0</div></div>
+    <div class="card" style="text-align:center"><div style="font-size:11px;color:#64748b">Budget Remaining</div><div style="font-size:18px;font-weight:700" id="lRemain">&#8377;1,00,000</div></div>
+    <div class="card" style="text-align:center"><div style="font-size:11px;color:#64748b">Purchased</div><div style="font-size:18px;font-weight:700;color:#10b981" id="lDone">0/0</div></div>
+  </div>
+  <div class="card" style="margin-bottom:14px">
+    <div style="font-weight:600;margin-bottom:8px">Add Product</div>
+    <input class="input" id="listQ" placeholder="Search product to add..." oninput="listSug()" style="max-width:400px"/>
+    <div id="listSugBox" style="margin-top:7px"></div>
+  </div>
+  <div id="listItems"></div>
+</div>
+
+<!-- SETTINGS -->
+<div id="pg-settings" class="page">
+  <h1 style="font-size:20px;font-weight:700;margin-bottom:16px">⚙️ Settings &amp; Preferences</h1>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;max-width:780px">
+    <div class="card">
+      <div style="font-weight:600;margin-bottom:12px">Budget &amp; Spending</div>
+      <label style="font-size:12px;color:#64748b;display:block;margin-bottom:4px">Monthly Budget (&#8377;)</label>
+      <input class="input" type="number" value="100000" style="margin-bottom:10px"/>
+      <label style="font-size:12px;color:#64748b;display:block;margin-bottom:4px">Currency</label>
+      <select class="input"><option>INR (&#8377;)</option></select>
+    </div>
+    <div class="card">
+      <div style="font-weight:600;margin-bottom:12px">Quality vs Price</div>
+      <label style="font-size:12px;color:#64748b;display:block;margin-bottom:7px">Preference: <strong id="qpL">Balanced</strong></label>
+      <input type="range" min="0" max="100" value="50" oninput="document.getElementById('qpL').textContent=this.value<35?'Price Focus':this.value>65?'Quality Focus':'Balanced'" style="width:100%;margin-bottom:14px"/>
+      <label style="font-size:12px;color:#64748b;display:block;margin-bottom:7px">Sustainability: <strong id="sL">Medium</strong></label>
+      <input type="range" min="0" max="100" value="50" oninput="document.getElementById('sL').textContent=this.value<35?'Low':this.value>65?'High':'Medium'" style="width:100%"/>
+    </div>
+    <div class="card">
+      <div style="font-weight:600;margin-bottom:10px">Preferred Categories</div>
+      <label style="font-size:13px;display:flex;align-items:center;gap:8px;margin-bottom:8px"><input type="checkbox" checked/> 📱 Smartphones</label>
+      <label style="font-size:13px;display:flex;align-items:center;gap:8px;margin-bottom:8px"><input type="checkbox" checked/> 💻 Laptops</label>
+      <label style="font-size:13px;display:flex;align-items:center;gap:8px;margin-bottom:8px"><input type="checkbox"/> 🎧 Headphones</label>
+      <label style="font-size:13px;display:flex;align-items:center;gap:8px;margin-bottom:8px"><input type="checkbox"/> ⌚ Smartwatches</label>
+      <label style="font-size:13px;display:flex;align-items:center;gap:8px"><input type="checkbox"/> 🏠 Home Appliances</label>
+    </div>
+    <div class="card">
+      <div style="font-weight:600;margin-bottom:10px">Notifications</div>
+      <div style="display:flex;justify-content:space-between;margin-bottom:11px"><span style="font-size:13px">Price Drop Alerts</span><input type="checkbox" checked style="width:17px;height:17px"/></div>
+      <div style="display:flex;justify-content:space-between;margin-bottom:11px"><span style="font-size:13px">Deal Notifications</span><input type="checkbox" checked style="width:17px;height:17px"/></div>
+      <div style="display:flex;justify-content:space-between"><span style="font-size:13px">Weekly Summary</span><input type="checkbox" style="width:17px;height:17px"/></div>
+    </div>
+    <div class="card" style="grid-column:1/-1">
+      <div style="font-weight:600;margin-bottom:11px">🤖 AI Integration Status</div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px">
+        <div style="flex:1;display:flex;gap:8px;align-items:center;background:#fef3c7;padding:10px 14px;border-radius:8px"><span style="font-size:18px">⚡</span><div><div style="font-size:13px;font-weight:600;color:#92400e">Demo Mode</div><div style="font-size:11.5px;color:#b45309">IBM watsonx.ai — set IBM_WATSONX_API_KEY in .env</div></div></div>
+        <div style="flex:1;display:flex;gap:8px;align-items:center;background:#f1f5f9;padding:10px 14px;border-radius:8px"><span style="font-size:18px">🔗</span><div><div style="font-size:13px;font-weight:600">IBM Langflow</div><div style="font-size:11.5px;color:#64748b">Set IBM_LANGFLOW_URL in .env</div></div></div>
+        <div style="flex:1;display:flex;gap:8px;align-items:center;background:#f0fdf4;padding:10px 14px;border-radius:8px"><span style="font-size:18px">✅</span><div><div style="font-size:13px;font-weight:600;color:#15803d">Local Engine</div><div style="font-size:11.5px;color:#16a34a">Running — all features active</div></div></div>
+      </div>
+      <button class="btn btn-p" onclick="toast2('Preferences saved!','success')">Save Preferences</button>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<!-- MODAL -->
+<div class="modal-bg" id="modal" onclick="closeM(event)">
+  <div class="modal-inner" onclick="event.stopPropagation()">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px">
+      <div id="mTitle" style="font-size:17px;font-weight:700;max-width:88%"></div>
+      <button onclick="document.getElementById('modal').classList.remove('open')" style="border:none;background:#f1f5f9;border-radius:6px;padding:5px 9px;cursor:pointer;font-size:15px">✕</button>
+    </div>
+    <div id="mBody"></div>
+  </div>
+</div>
+<div id="toast"></div>
+
+<script>
+const P=[
+{id:'p01',n:'Samsung Galaxy S23 FE',b:'Samsung',c:'smartphones',p:34999,o:44999,d:22,r:4.3,rv:3421,img:'https://placehold.co/100x100/dbeafe/1e40af?text=S23+FE',sp:{Display:'6.4" AMOLED 120Hz',CPU:'Exynos 2200',RAM:'8GB',Storage:'128GB',Camera:'50+12+8MP',Battery:'4500mAh 25W','5G':'Yes'},tags:['5G','AMOLED','120Hz','Fast Charge','IP68'],pros:['Bright AMOLED display','IP68 water resistant','Regular updates'],cons:['No charger in box','Plastic back'],sust:62,val:78,ph:[44999,42999,39999,37999,36499,34999],revs:[{a:'Rahul M.',r:5,t:'Great phone! Display and camera excellent.',v:true},{a:'Priya S.',r:4,t:'Good performance, battery average.',v:true}]},
+{id:'p02',n:'Redmi Note 13 Pro',b:'Redmi',c:'smartphones',p:24999,o:29999,d:17,r:4.4,rv:5123,img:'https://placehold.co/100x100/dcfce7/166534?text=Note13',sp:{Display:'6.67" AMOLED 120Hz',CPU:'Snapdragon 7s Gen2',RAM:'8GB',Storage:'256GB',Camera:'200MP',Battery:'5100mAh 67W','5G':'Yes'},tags:['5G','200MP','Fast Charge','AMOLED'],pros:['200MP camera','67W fast charge','5G connectivity'],cons:['No headphone jack','Average thermals'],sust:55,val:82,ph:[29999,28499,27999,26999,25999,24999],revs:[{a:'Aarav K.',r:5,t:'Best under 25k! Camera is mind-blowing.',v:true}]},
+{id:'p03',n:'OnePlus Nord CE 3',b:'OnePlus',c:'smartphones',p:26999,o:33999,d:21,r:4.2,rv:2841,img:'https://placehold.co/100x100/fae8ff/6b21a8?text=NordCE3',sp:{Display:'6.7" AMOLED 120Hz',CPU:'Snapdragon 782G',RAM:'8GB',Storage:'128GB',Camera:'50+8+2MP',Battery:'5000mAh 80W','5G':'Yes'},tags:['5G','80W Charge','AMOLED','OxygenOS'],pros:['80W super fast charge','Clean OxygenOS','Bright display'],cons:['Average low-light camera','Plastic build'],sust:50,val:74,ph:[33999,31999,30999,29499,28499,26999],revs:[{a:'Vikram T.',r:4,t:'OnePlus quality at great price.',v:true}]},
+{id:'p04',n:'iQOO Z9',b:'iQOO',c:'smartphones',p:19999,o:23999,d:17,r:4.3,rv:1987,img:'https://placehold.co/100x100/fff7ed/9a3412?text=iQOOZ9',sp:{Display:'6.67" AMOLED 144Hz',CPU:'Snapdragon 7 Gen3',RAM:'8GB',Storage:'128GB',Battery:'5000mAh 44W','5G':'Yes'},tags:['5G','144Hz','Gaming'],pros:['144Hz gaming display','Powerful chip','Great battery'],cons:['Only 2 cameras'],sust:48,val:85,ph:[23999,22999,21999,21499,20499,19999],revs:[{a:'Arjun M.',r:5,t:'Gaming beast under 20k! 144Hz is so smooth.',v:true}]},
+{id:'p05',n:'Realme Narzo 60',b:'Realme',c:'smartphones',p:15999,o:18999,d:16,r:4.0,rv:1543,img:'https://placehold.co/100x100/fef2f2/991b1b?text=Narzo60',sp:{Display:'6.43" AMOLED 90Hz',CPU:'Dimensity 6020',RAM:'6GB',Storage:'128GB',Battery:'5000mAh 33W','5G':'Yes'},tags:['5G','Budget','AMOLED'],pros:['Budget 5G','Good battery','AMOLED'],cons:['Mediocre camera','Basic performance'],sust:42,val:71,ph:[18999,17999,17499,16999,16499,15999],revs:[{a:'Prerna D.',r:4,t:'Best budget 5G phone.',v:false}]},
+{id:'p06',n:'Lenovo IdeaPad Slim 3',b:'Lenovo',c:'laptops',p:45999,o:55999,d:18,r:4.2,rv:3201,img:'https://placehold.co/100x100/eff6ff/1d4ed8?text=IdeaPad',sp:{Display:'15.6" FHD IPS',CPU:'Ryzen 5 7520U',RAM:'16GB DDR5',Storage:'512GB SSD',Battery:'14 hrs',Weight:'1.62kg'},tags:['Ryzen5','DDR5','SSD','Office'],pros:['Excellent value','Long battery','Lightweight'],cons:['Plastic build','Average brightness'],sust:61,val:80,ph:[55999,53999,51999,49999,47999,45999],revs:[{a:'Suresh P.',r:4,t:'Great student laptop, fast and reliable.',v:true},{a:'Kavya L.',r:5,t:'Best value laptop I have used!',v:true}]},
+{id:'p07',n:'Acer Aspire 7 RTX 2050',b:'Acer',c:'laptops',p:56999,o:69999,d:19,r:4.4,rv:4102,img:'https://placehold.co/100x100/fff1f2/9f1239?text=Aspire7',sp:{Display:'15.6" FHD 144Hz',CPU:'Ryzen 5 7535HS',RAM:'16GB',Storage:'512GB SSD',GPU:'RTX 2050 4GB',Battery:'8 hrs'},tags:['RTX2050','144Hz','Gaming','SSD'],pros:['Dedicated GPU','144Hz display','Ryzen power'],cons:['Heavier build','Fan noise under load'],sust:52,val:83,ph:[69999,67999,64999,61999,58999,56999],revs:[{a:'Karthik V.',r:5,t:'Best gaming laptop under 60k!',v:true}]},
+{id:'p08',n:'ASUS VivoBook 15',b:'ASUS',c:'laptops',p:41999,o:50999,d:18,r:4.1,rv:3456,img:'https://placehold.co/100x100/ecfdf5/065f46?text=VivoBook',sp:{Display:'15.6" FHD IPS',CPU:'Ryzen 5 7520U',RAM:'8GB',Storage:'512GB SSD',Battery:'12 hrs',Weight:'1.5kg'},tags:['Ryzen5','SSD','Lightweight'],pros:['Very lightweight','Good battery','Affordable'],cons:['8GB RAM limiting','Average keyboard'],sust:64,val:75,ph:[50999,48999,46999,45499,43999,41999],revs:[{a:'Anita S.',r:4,t:'Super lightweight! Perfect daily carry.',v:true}]},
+{id:'p09',n:'HP Pavilion 15',b:'HP',c:'laptops',p:52999,o:63999,d:17,r:4.3,rv:2876,img:'https://placehold.co/100x100/fdf4ff/6b21a8?text=HPPavilion',sp:{Display:'15.6" FHD IPS',CPU:'Core i5-1335U',RAM:'16GB',Storage:'512GB SSD',Battery:'10 hrs'},tags:['Intel i5','SSD','Backlit Keyboard'],pros:['Premium build','Good display','Reliable support'],cons:['Slightly heavy','No discrete GPU'],sust:58,val:77,ph:[63999,61999,59999,57999,55999,52999],revs:[{a:'Deepak R.',r:4,t:'HP build quality always top notch.',v:true}]},
+{id:'p10',n:'Sony WH-1000XM4',b:'Sony',c:'headphones',p:19990,o:29990,d:33,r:4.8,rv:8921,img:'https://placehold.co/100x100/fef3c7/92400e?text=XM4',sp:{Type:'Over-ear',ANC:'Industry-leading',Battery:'30 hrs',Codec:'LDAC/aptX',Bluetooth:'5.0'},tags:['ANC','LDAC','30hr Battery','Premium'],pros:['Best-in-class ANC','Exceptional sound quality','30hr battery'],cons:['Touch controls finicky','Ear cups get warm'],sust:70,val:95,ph:[29990,26990,24990,22990,21490,19990],revs:[{a:'Meera J.',r:5,t:'Best headphones I have ever owned! ANC is magical.',v:true},{a:'Sandeep K.',r:5,t:'Worth every rupee!',v:true}]},
+{id:'p11',n:'boAt Rockerz 550',b:'boAt',c:'headphones',p:1499,o:3990,d:62,r:4.0,rv:45231,img:'https://placehold.co/100x100/fdf2f8/be185d?text=Rockerz',sp:{Type:'Over-ear',ANC:'No',Battery:'20 hrs',Bluetooth:'5.0'},tags:['Budget','Bass Boost','Foldable'],pros:['Great value for money','Punchy bass','Comfortable'],cons:['No ANC','Plastic build'],sust:32,val:88,ph:[3990,2990,2490,1990,1699,1499],revs:[{a:'Sanjay M.',r:4,t:'Budget king! Bass amazing for this price.',v:true}]},
+{id:'p12',n:'JBL Tune 770NC',b:'JBL',c:'headphones',p:7999,o:12999,d:38,r:4.2,rv:3871,img:'https://placehold.co/100x100/eff6ff/1d4ed8?text=JBL770NC',sp:{Type:'Over-ear',ANC:'Adaptive',Battery:'44 hrs',Bluetooth:'5.3'},tags:['ANC','44hr Battery','Multipoint'],pros:['44hr battery life','Decent ANC','JBL bass'],cons:['Slightly plasticky','ANC below Sony'],sust:56,val:86,ph:[12999,11499,10499,9499,8499,7999],revs:[{a:'Rahul G.',r:4,t:'44 hours unbelievable! Great value.',v:true}]},
+{id:'p13',n:'Apple Watch SE (2nd Gen)',b:'Apple',c:'smartwatches',p:29900,o:35900,d:17,r:4.5,rv:6234,img:'https://placehold.co/100x100/f0fdf4/166534?text=Watch+SE',sp:{Display:'LTPO OLED',Chip:'S8',GPS:'Yes',Water:'50m',Battery:'18 hrs'},tags:['Apple','GPS','Health Tracking','WatchOS'],pros:['Best Apple Watch value','watchOS ecosystem','Crash detection'],cons:['iPhone only','No always-on display'],sust:66,val:80,ph:[35900,34900,33900,32900,31900,29900],revs:[{a:'Ishaan V.',r:5,t:'Perfect companion to my iPhone.',v:true}]},
+{id:'p14',n:'Samsung Galaxy Watch 6',b:'Samsung',c:'smartwatches',p:27999,o:34999,d:20,r:4.4,rv:4231,img:'https://placehold.co/100x100/dbeafe/1e40af?text=Watch+6',sp:{Display:'1.5" AMOLED',Chip:'Exynos W930',GPS:'Built-in',Battery:'40 hrs'},tags:['AMOLED','ECG','BIA Body Comp','GPS'],pros:['ECG and body composition','AMOLED display','40hr battery'],cons:['Best with Samsung phones'],sust:62,val:82,ph:[34999,32999,31499,30499,29499,27999],revs:[{a:'Abhishek M.',r:4,t:'ECG feature genuinely useful.',v:true}]},
+{id:'p15',n:'Noise ColorFit Pro 4',b:'Noise',c:'smartwatches',p:3499,o:6999,d:50,r:4.0,rv:12453,img:'https://placehold.co/100x100/fff7ed/9a3412?text=ColorFit',sp:{Display:'1.72" TFT',GPS:'Connected GPS',Battery:'7 days',Water:'IP68'},tags:['Budget','IP68','7 Day Battery','BT Calling'],pros:['BT calling','7-day battery','Budget-friendly'],cons:['No GPS','LCD display'],sust:38,val:80,ph:[6999,5999,4999,4499,3999,3499],revs:[{a:'Tanvi P.',r:4,t:'Best budget smartwatch!',v:false}]},
+{id:'p16',n:'Amazfit GTR 4',b:'Amazfit',c:'smartwatches',p:12999,o:17999,d:28,r:4.3,rv:3102,img:'https://placehold.co/100x100/ecfdf5/065f46?text=GTR+4',sp:{Display:'1.43" AMOLED',GPS:'L1+L5 Dual Band',Battery:'14 days',Water:'5ATM'},tags:['14 Day Battery','Dual GPS','AMOLED'],pros:['14-day battery','Dual-band GPS','AMOLED'],cons:['Zepp OS limited'],sust:55,val:85,ph:[17999,16499,15499,14499,13499,12999],revs:[{a:'Pooja N.',r:5,t:'14 day battery is incredible!',v:true}]},
+{id:'p17',n:'LG 8kg Washing Machine',b:'LG',c:'home_appliances',p:35990,o:45990,d:22,r:4.5,rv:5102,img:'https://placehold.co/100x100/eff6ff/1d4ed8?text=LG+Wash',sp:{Capacity:'8kg',Type:'Front Load',RPM:'1400',Energy:'5 Star',Inverter:'Direct Drive'},tags:['5 Star','Inverter','Front Load','Energy Efficient'],pros:['Excellent efficiency','Quiet operation','Smart diagnosis'],cons:['Longer wash cycles'],sust:78,val:87,ph:[45990,43990,41990,39990,37990,35990],revs:[{a:'Usha M.',r:5,t:'Energy bill reduced significantly!',v:true}]},
+{id:'p18',n:'Philips Air Fryer HD9200',b:'Philips',c:'home_appliances',p:7995,o:11995,d:33,r:4.4,rv:8923,img:'https://placehold.co/100x100/fff7ed/9a3412?text=Air+Fryer',sp:{Capacity:'4.1L',Power:'1400W',Temp:'80-200C',Timer:'60 min'},tags:['Air Fryer','Healthy Cooking','Easy Clean'],pros:['Healthier cooking','Easy to clean','Large capacity'],cons:['No digital display'],sust:72,val:88,ph:[11995,10995,9995,8995,8495,7995],revs:[{a:'Rekha S.',r:5,t:'Completely changed our cooking!',v:true}]},
+{id:'p19',n:'Dyson V12 Detect Slim',b:'Dyson',c:'home_appliances',p:44900,o:54900,d:18,r:4.6,rv:2103,img:'https://placehold.co/100x100/fdf4ff/6b21a8?text=Dyson+V12',sp:{Type:'Cordless Vacuum',Suction:'150 AW',Runtime:'60 min',Filter:'HEPA',Weight:'2.2kg'},tags:['Cordless','HEPA Filter','Laser Detect','Premium'],pros:['Laser dust detection','Excellent suction','HEPA filtration'],cons:['Very expensive','60min runtime'],sust:65,val:78,ph:[54900,52900,50900,48900,46900,44900],revs:[{a:'Nita K.',r:5,t:'Laser detection actually useful!',v:true}]},
+{id:'p20',n:'Havells 1.5T Split AC',b:'Havells',c:'home_appliances',p:38990,o:49990,d:22,r:4.2,rv:1823,img:'https://placehold.co/100x100/ecfdf5/065f46?text=Havells+AC',sp:{Capacity:'1.5 Ton',Stars:'5 Star',Inverter:'Yes',Filter:'PM2.5 Filter'},tags:['5 Star','Inverter','PM2.5 Filter','Auto Clean'],pros:['5-star energy rating','PM2.5 filter','Auto clean'],cons:['No WiFi','Limited service'],sust:68,val:80,ph:[49990,47990,45990,43990,41990,38990],revs:[{a:'Bala S.',r:4,t:'Very efficient AC.',v:true}]},
+{id:'p21',n:'Sennheiser HD 450BT',b:'Sennheiser',c:'headphones',p:9990,o:14990,d:33,r:4.3,rv:2341,img:'https://placehold.co/100x100/fef9c3/713f12?text=HD450BT',sp:{Type:'Over-ear',ANC:'Hybrid ANC',Battery:'30 hrs',Codec:'aptX'},tags:['ANC','30hr Battery','aptX','Balanced Sound'],pros:['Balanced sound signature','30hr battery','aptX'],cons:['ANC below Sony','Slightly bulky'],sust:60,val:82,ph:[14990,13490,12490,11490,10990,9990],revs:[{a:'Nikhil R.',r:4,t:'Sennheiser balanced tuning is perfect.',v:true}]},
+{id:'p22',n:'boAt Airdopes 141',b:'boAt',c:'headphones',p:1299,o:3490,d:63,r:3.9,rv:89231,img:'https://placehold.co/100x100/f0fdf4/166534?text=Airdopes',sp:{Type:'TWS In-ear',Battery:'42 hrs total',Bluetooth:'5.1',IPX4:'Yes'},tags:['Budget TWS','42hr Total','IPX4'],pros:['42hr total battery','Ultra affordable','IPX4 sweat resistant'],cons:['No ANC','SBC codec only'],sust:28,val:80,ph:[3490,2490,1990,1690,1499,1299],revs:[{a:'Mansi T.',r:4,t:'Way better than expected at this price!',v:false}]},
+{id:'p23',n:'boAt Storm Call 2',b:'boAt',c:'smartwatches',p:1999,o:4999,d:60,r:3.9,rv:23102,img:'https://placehold.co/100x100/fdf2f8/be185d?text=Storm+2',sp:{Display:'1.83" TFT',GPS:'Connected GPS',Battery:'5 days',Water:'IP68'},tags:['Budget','BT Calling','IP68'],pros:['Ultra budget price','BT calling','Large display'],cons:['Basic health tracking','Plastic build'],sust:30,val:72,ph:[4999,3999,2999,2499,2199,1999],revs:[{a:'Anand R.',r:4,t:'Does everything I need at this price!',v:false}]},
+{id:'p24',n:'Bajaj Majesty Room Heater',b:'Bajaj',c:'home_appliances',p:2499,o:3499,d:29,r:4.1,rv:7823,img:'https://placehold.co/100x100/fff1f2/9f1239?text=Bajaj+RH',sp:{Power:'2000W',Type:'Fan Heater',Safety:'Thermal cut-off',Warranty:'2 Years'},tags:['Budget','Portable','Fast Heating'],pros:['Fast heating','Lightweight','Safety cut-off'],cons:['Can dry out air','Small rooms only'],sust:35,val:76,ph:[3499,3199,2999,2799,2699,2499],revs:[{a:'Geetha M.',r:4,t:'Heats up in minutes!',v:false}]},
+{id:'p25',n:'Dell Inspiron 15',b:'Dell',c:'laptops',p:58999,o:72999,d:19,r:4.3,rv:2910,img:'https://placehold.co/100x100/f8fafc/1e293b?text=Dell+I15',sp:{Display:'15.6" FHD',CPU:'Core i5-1335U',RAM:'16GB',Storage:'512GB SSD',Battery:'9 hrs'},tags:['Intel i5','SSD','Dell','Reliable'],pros:['Dell reliability','Good display','Solid build'],cons:['Average battery','Heavier than rivals'],sust:57,val:76,ph:[72999,69999,66999,63999,61999,58999],revs:[{a:'Manish V.',r:4,t:'Dell quality never disappoints.',v:true}]}
+];
+
+const MO=['Jan','Feb','Mar','Apr','May','Jun'];
+let cmpList=[],tracked=[],myList=[];
+try{tracked=JSON.parse(localStorage.getItem('sc_tr')||'[]')}catch(e){}
+try{myList=JSON.parse(localStorage.getItem('sc_li')||'[]')}catch(e){}
+const save=()=>{localStorage.setItem('sc_tr',JSON.stringify(tracked));localStorage.setItem('sc_li',JSON.stringify(myList))};
+const fmt=n=>'&#8377;'+n.toLocaleString('en-IN');
+const stars=r=>'&#9733;'.repeat(Math.round(r))+'&#9734;'.repeat(5-Math.round(r));
+
+function toast2(msg,type='info'){
+  const t=document.getElementById('toast');
+  const d=document.createElement('div');
+  d.style.cssText='background:'+(type==='success'?'#10b981':type==='error'?'#ef4444':'#3b82f6')+';color:#fff;padding:9px 15px;border-radius:8px;font-size:13px;font-weight:500;box-shadow:0 4px 12px rgba(0,0,0,.15);pointer-events:all';
+  d.innerHTML=msg;t.appendChild(d);setTimeout(()=>d.remove(),3000);
+}
+
+function nav(id,el){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('pg-'+id).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  if(el)el.classList.add('active');
+  if(id==='pulse')renderPulse();
+  if(id==='tracker')renderTracker();
+  if(id==='list')renderList();
+  if(id==='reviews')populateRevSel();
+  updateStats();
+}
+
+document.getElementById('dateStr').textContent=new Date().toLocaleDateString('en-IN',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+
+function card(pr,reason){
+  const sv=pr.o-pr.p;
+  const rh=reason?'<div style="font-size:11px;color:#2563eb;margin-top:5px;padding:5px 8px;background:#eff6ff;border-radius:5px">&#128161; '+reason+'</div>':'';
+  return '<div class="card" style="cursor:pointer" onmouseenter="this.style.boxShadow=\'0 4px 14px rgba(0,0,0,.08)\'" onmouseleave="this.style.boxShadow=\'\'" onclick="openM(\''+pr.id+'\')">'+
+    '<div style="text-align:center;margin-bottom:9px"><img src="'+pr.img+'" style="width:72px;height:72px;object-fit:contain;border-radius:8px"/></div>'+
+    '<div style="font-size:10.5px;color:#94a3b8;font-weight:600;text-transform:uppercase">'+pr.b+'</div>'+
+    '<div style="font-size:13px;font-weight:600;margin:3px 0 5px;line-height:1.3">'+pr.n+'</div>'+
+    '<div style="font-size:11.5px;color:#f59e0b;margin-bottom:5px">'+stars(pr.r)+' <span style="color:#64748b">'+pr.r+' ('+pr.rv.toLocaleString()+')</span></div>'+
+    '<div style="display:flex;align-items:baseline;gap:6px;margin-bottom:7px"><span style="font-size:15px;font-weight:700">'+fmt(pr.p)+'</span>'+(pr.o>pr.p?'<span style="font-size:11px;color:#94a3b8;text-decoration:line-through">'+fmt(pr.o)+'</span><span style="background:#dcfce7;color:#15803d;font-size:10.5px;padding:1px 6px;border-radius:4px;font-weight:600">-'+pr.d+'%</span>':'')+'</div>'+
+    '<div style="display:flex;gap:1px">'+
+    '<button onclick="event.stopPropagation();addCmp(\''+pr.id+'\')" style="flex:1;padding:5px 2px;background:#eff6ff;color:#2563eb;border:none;border-radius:5px 0 0 5px;font-size:10.5px;font-weight:600;cursor:pointer">&#9878; Cmp</button>'+
+    '<button onclick="event.stopPropagation();addToList(\''+pr.id+'\')" style="flex:1;padding:5px 2px;background:#f0fdf4;color:#15803d;border:none;border-radius:0;font-size:10.5px;font-weight:600;cursor:pointer">+ List</button>'+
+    '<button onclick="event.stopPropagation();qTrack(\''+pr.id+'\')" style="flex:1;padding:5px 2px;background:#fef3c7;color:#b45309;border:none;border-radius:0 5px 5px 0;font-size:10.5px;font-weight:600;cursor:pointer">&#128200; Track</button>'+
+    '</div>'+rh+'</div>';
+}
+
+function updateStats(){
+  document.getElementById('statsRow').innerHTML=
+    '<div class="card" style="text-align:center"><div style="font-size:11px;color:#64748b">Total Savings Available</div><div style="font-size:20px;font-weight:700;color:#10b981">'+fmt(P.reduce((s,p)=>s+(p.o-p.p),0))+'</div><div style="font-size:10.5px;color:#94a3b8">Across all products</div></div>'+
+    '<div class="card" style="text-align:center"><div style="font-size:11px;color:#64748b">Tracked Products</div><div style="font-size:20px;font-weight:700;color:#3b82f6">'+tracked.length+'</div><div style="font-size:10.5px;color:#94a3b8">Price alerts set</div></div>'+
+    '<div class="card" style="text-align:center"><div style="font-size:11px;color:#64748b">Shopping List</div><div style="font-size:20px;font-weight:700;color:#7c3aed">'+myList.length+'</div><div style="font-size:10.5px;color:#94a3b8">Items queued</div></div>';
+}
+
+function initDash(){
+  const tr=[...P].sort((a,b)=>b.d-a.d).slice(0,4);
+  const rec=[...P].sort((a,b)=>b.val-a.val).slice(0,4);
+  document.getElementById('trendGrid').innerHTML=tr.map(p=>card(p)).join('');
+  document.getElementById('recGrid').innerHTML=rec.map(p=>card(p,'Top value pick for you')).join('');
+  updateStats();
+}
+initDash();
+
+function dashGo(){
+  const q=document.getElementById('dashQ').value.trim();
+  if(!q)return;
+  document.getElementById('searchQ').value=q;
+  nav('search',document.querySelectorAll('.nav-item')[1]);
+  doSearch();
+}
+
+let allR=[...P];
+function doSearch(){
+  const q=document.getElementById('searchQ').value.trim().toLowerCase();
+  if(!q){allR=[...P];applyF();return;}
+  const bm=q.match(/(?:under|below|within)[^\d]*(\d[\d,]*)/i);
+  const budget=bm?parseFloat(bm[1].replace(',','')) :null;
+  const cm={phone:'smartphones',smartphone:'smartphones',mobile:'smartphones',laptop:'laptops',notebook:'laptops',headphone:'headphones',earphone:'headphones',watch:'smartwatches',ac:'home_appliances',vacuum:'home_appliances',washing:'home_appliances',fryer:'home_appliances'};
+  let cat=null;
+  for(const[k,v] of Object.entries(cm)){if(q.includes(k)){cat=v;break;}}
+  const kws=q.split(/\s+/).filter(w=>w.length>2);
+  allR=P.filter(p=>{
+    if(cat&&p.c!==cat)return false;
+    if(budget&&p.p>budget)return false;
+    const s=(p.n+' '+p.b+' '+p.tags.join(' ')).toLowerCase();
+    return kws.some(kw=>s.includes(kw));
+  });
+  if(!allR.length)allR=P.filter(p=>(cat?p.c===cat:true)&&(budget?p.p<=budget:true));
+  const qa=[];
+  if(cat)qa.push('<span style="background:#dbeafe;color:#1d4ed8;font-size:11px;padding:2px 7px;border-radius:4px;font-weight:500">Category: '+cat+'</span>');
+  if(budget)qa.push('<span style="background:#dcfce7;color:#15803d;font-size:11px;padding:2px 7px;border-radius:4px;font-weight:500">Budget: '+fmt(budget)+'</span>');
+  document.getElementById('searchMeta').innerHTML='<strong>'+allR.length+'</strong> results '+qa.join(' ')+' <span style="background:#fef3c7;color:#92400e;font-size:11px;padding:2px 7px;border-radius:4px;font-weight:500">Demo Data</span>';
+  applyF();
+}
+function applyF(){
+  let r=[...allR];
+  const cat=document.getElementById('fCat').value;
+  const max=parseFloat(document.getElementById('fMax').value)||0;
+  const mr=parseFloat(document.getElementById('fRating').value)||0;
+  const srt=document.getElementById('fSort').value;
+  if(cat)r=r.filter(p=>p.c===cat);
+  if(max>0)r=r.filter(p=>p.p<=max);
+  if(mr>0)r=r.filter(p=>p.r>=mr);
+  if(srt==='pa')r.sort((a,b)=>a.p-b.p);
+  else if(srt==='pd')r.sort((a,b)=>b.p-a.p);
+  else if(srt==='rating')r.sort((a,b)=>b.r-a.r);
+  else if(srt==='disc')r.sort((a,b)=>b.d-a.d);
+  else r.sort((a,b)=>b.val-a.val);
+  if(!document.getElementById('searchMeta').textContent.trim())
+    document.getElementById('searchMeta').innerHTML='<strong>'+r.length+'</strong> products <span style="background:#fef3c7;color:#92400e;font-size:11px;padding:2px 7px;border-radius:4px">Demo Data</span>';
+  document.getElementById('searchResults').innerHTML=r.length?r.map(p=>card(p)).join(''):'<div style="grid-column:1/-1;text-align:center;color:#94a3b8;padding:40px">No products match your filters. Try clearing filters.</div>';
+}
+function qs(q){document.getElementById('searchQ').value=q;doSearch();}
+function clearF(){document.getElementById('fCat').value='';document.getElementById('fMax').value='';document.getElementById('fRating').value='';document.getElementById('fSort').value='val';allR=[...P];document.getElementById('searchMeta').innerHTML='';applyF();}
+
+function openM(id){
+  const pr=P.find(x=>x.id===id);
+  if(!pr)return;
+  document.getElementById('mTitle').textContent=pr.n;
+  const sv=pr.o-pr.p;
+  const ph=pr.ph.map((v,i)=>'<div style="display:flex;align-items:center;gap:7px;margin-bottom:3px"><span style="font-size:11px;color:#94a3b8;width:30px">'+MO[i]+'</span><div class="pbar" style="flex:1"><div class="pfill" style="width:'+Math.round(v/pr.o*100)+'%;background:'+(v===pr.p?'#10b981':'#3b82f6')+'"></div></div><span style="font-size:11.5px;font-weight:'+(v===pr.p?700:400)+';width:64px;text-align:right">'+fmt(v)+'</span></div>').join('');
+  const specs=Object.entries(pr.sp).map(([k,v])=>'<tr><td style="font-size:11.5px;color:#64748b;padding:6px 8px;font-weight:500;white-space:nowrap;border-bottom:1px solid #f1f5f9">'+k+'</td><td style="font-size:12px;padding:6px 8px;border-bottom:1px solid #f1f5f9">'+v+'</td></tr>').join('');
+  const revs=pr.revs.map(rv=>'<div style="padding:8px 0;border-bottom:1px solid #f1f5f9"><div style="display:flex;justify-content:space-between;margin-bottom:3px"><strong style="font-size:12.5px">'+rv.a+'</strong><span style="font-size:11.5px;color:#f59e0b">'+stars(rv.r)+' '+rv.r+'/5</span></div><p style="font-size:12.5px;color:#374151;margin:0 0 4px">'+rv.t+'</p><span style="background:'+(rv.v?'#dcfce7':'#f1f5f9')+';color:'+(rv.v?'#15803d':'#64748b')+';font-size:10px;padding:2px 6px;border-radius:3px;font-weight:500">'+(rv.v?'&#10003; Verified':'Unverified')+' &bull; Demo Review</span></div>').join('');
+  document.getElementById('mBody').innerHTML=
+    '<div style="display:grid;grid-template-columns:100px 1fr;gap:14px;margin-bottom:14px">'+
+    '<img src="'+pr.img+'" style="width:100px;height:100px;object-fit:contain;border-radius:8px;border:1px solid #e2e8f0"/>'+
+    '<div><div style="font-size:11px;color:#94a3b8;font-weight:600;text-transform:uppercase;margin-bottom:4px">'+pr.b+' &bull; '+pr.c+'</div>'+
+    '<div style="display:flex;align-items:baseline;gap:7px;margin-bottom:6px"><span style="font-size:20px;font-weight:700">'+fmt(pr.p)+'</span>'+(pr.o>pr.p?'<span style="font-size:11.5px;color:#94a3b8;text-decoration:line-through">'+fmt(pr.o)+'</span><span style="background:#dcfce7;color:#15803d;font-size:11px;padding:2px 6px;border-radius:4px;font-weight:600">Save '+fmt(sv)+'</span>':'')+'</div>'+
+    '<div style="font-size:12.5px;margin-bottom:8px;color:#64748b">'+stars(pr.r)+' '+pr.r+' &bull; '+pr.rv.toLocaleString()+' reviews</div>'+
+    '<div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px">'+pr.tags.map(t=>'<span style="background:#eff6ff;color:#2563eb;font-size:10.5px;padding:2px 6px;border-radius:4px;font-weight:500">'+t+'</span>').join('')+'</div>'+
+    '<div style="display:flex;gap:5px"><button class="btn btn-p" onclick="addToList(\''+pr.id+'\');toast2(\'Added to list\',\'success\')" style="font-size:12px;padding:6px 11px">+ My List</button>'+
+    '<button class="btn btn-s" onclick="addCmp(\''+pr.id+'\')" style="font-size:12px;padding:6px 11px">&#9878; Compare</button>'+
+    '<button class="btn btn-s" onclick="qTrack(\''+pr.id+'\')" style="font-size:12px;padding:6px 11px">&#128200; Track</button></div></div></div>'+
+    '<div class="g2" style="margin-bottom:12px">'+
+    '<div><div style="font-size:11.5px;font-weight:600;color:#15803d;margin-bottom:6px">&#10003; PROS</div>'+pr.pros.map(x=>'<div style="font-size:12.5px;margin-bottom:3px">&bull; '+x+'</div>').join('')+'</div>'+
+    '<div><div style="font-size:11.5px;font-weight:600;color:#dc2626;margin-bottom:6px">&#10007; CONS</div>'+pr.cons.map(x=>'<div style="font-size:12.5px;margin-bottom:3px">&bull; '+x+'</div>').join('')+'</div></div>'+
+    '<div class="g2" style="margin-bottom:12px">'+
+    '<div><div style="font-size:11.5px;font-weight:600;color:#64748b;margin-bottom:6px">&#127807; Sustainability</div><div style="display:flex;align-items:center;gap:8px"><div class="pbar" style="flex:1"><div class="pfill" style="width:'+pr.sust+'%;background:'+(pr.sust>65?'#10b981':pr.sust>40?'#f59e0b':'#ef4444')+'"></div></div><strong style="font-size:12px">'+pr.sust+'/100</strong></div><div style="font-size:10.5px;color:#94a3b8;margin-top:3px">Demo score &mdash; not verified data</div></div>'+
+    '<div><div style="font-size:11.5px;font-weight:600;color:#64748b;margin-bottom:6px">&#128142; Value Score</div><div style="display:flex;align-items:center;gap:8px"><div class="pbar" style="flex:1"><div class="pfill" style="width:'+pr.val+'%;background:#7c3aed"></div></div><strong style="font-size:12px">'+pr.val+'/100</strong></div></div></div>'+
+    '<div style="margin-bottom:12px"><div style="font-size:11.5px;font-weight:600;color:#64748b;margin-bottom:6px">&#128200; Price History <span style="font-weight:400;color:#94a3b8">(Demo &mdash; Synthetic Data)</span></div>'+ph+'</div>'+
+    '<details><summary style="font-size:11.5px;font-weight:600;color:#64748b;cursor:pointer;margin-bottom:6px">&#128203; Full Specifications</summary><table style="width:100%;border-collapse:collapse">'+specs+'</table></details>'+
+    '<details style="margin-top:10px"><summary style="font-size:11.5px;font-weight:600;color:#64748b;cursor:pointer;margin-bottom:6px">&#128172; Sample Reviews <span style="font-weight:400;color:#94a3b8">(Demo &mdash; not real customer data)</span></summary>'+revs+'</details>';
+  document.getElementById('modal').classList.add('open');
+}
+function closeM(e){if(e.target===document.getElementById('modal'))document.getElementById('modal').classList.remove('open');}
+
+/* ---- COMPARE ---- */
+function addCmp(id){
+  if(cmpList.includes(id)){toast2('Already in comparison','info');return;}
+  if(cmpList.length>=4){toast2('Max 4 products — remove one first','error');return;}
+  cmpList.push(id);renderCmpChips();toast2('Added to comparison','success');
+}
+function remCmp(id){cmpList=cmpList.filter(x=>x!==id);renderCmpChips();document.getElementById('cmpTable').innerHTML='';document.getElementById('cmpSummary').style.display='none';}
+function renderCmpChips(){
+  document.getElementById('cmpChips').innerHTML=cmpList.map(id=>{
+    const pr=P.find(x=>x.id===id);
+    return '<span style="display:inline-flex;align-items:center;gap:5px;background:#eff6ff;color:#2563eb;padding:3px 9px;border-radius:999px;font-size:12px;font-weight:500">'+pr.n+' <span onclick="remCmp(\''+id+'\')" style="cursor:pointer;color:#94a3b8;font-size:13px">&#10005;</span></span>';
+  }).join('');
+}
+function cmpSug(){
+  const q=document.getElementById('cmpQ').value.toLowerCase();
+  const box=document.getElementById('cmpSugBox');
+  if(!q){box.innerHTML='';return;}
+  const hits=P.filter(p=>(p.n+' '+p.b).toLowerCase().includes(q)).slice(0,5);
+  box.innerHTML=hits.length?'<div style="background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:4px;box-shadow:0 4px 12px rgba(0,0,0,.08)">'+hits.map(pr=>'<div style="padding:7px 11px;cursor:pointer;border-radius:5px;font-size:13px" onmouseenter="this.style.background=\'#f1f5f9\'" onmouseleave="this.style.background=\'\'" onclick="addCmp(\''+pr.id+'\');document.getElementById(\'cmpQ\').value=\'\';document.getElementById(\'cmpSugBox\').innerHTML=\'\'">'+pr.n+' <span style="color:#94a3b8;font-size:11px">'+fmt(pr.p)+'</span></div>').join('')+'</div>':'';
+}
+let activePrio='val';
+function setPrio(p){
+  activePrio=p;
+  ['val','qual','price','sust'].forEach(k=>{const el=document.getElementById('pr-'+k);el.style.background='#f1f5f9';el.style.color='#1e293b';el.style.fontWeight='500';});
+  const el=document.getElementById('pr-'+p);el.style.background='#eff6ff';el.style.color='#2563eb';el.style.fontWeight='700';
+}
+setPrio('val');
+function runCmp(){
+  if(cmpList.length<2){toast2('Add at least 2 products to compare','error');return;}
+  const prods=cmpList.map(id=>P.find(x=>x.id===id));
+  const sc=pr=>{
+    if(activePrio==='price')return -pr.p;
+    if(activePrio==='qual')return pr.r*20+pr.val*0.3;
+    if(activePrio==='sust')return pr.sust;
+    return pr.val*0.5+pr.r*10+pr.d*0.4;
+  };
+  const scored=[...prods].sort((a,b)=>sc(b)-sc(a));
+  const winner=scored[0];
+  const rows=[['Price',p=>fmt(p.p)],['Discount',p=>p.d+'%'],['Rating',p=>p.r+String.fromCharCode(9733)+' ('+p.rv.toLocaleString()+')'],['Value Score',p=>p.val+'/100'],['Sustainability',p=>p.sust+'/100'],['Top Pro',p=>p.pros[0]||'—'],['Top Con',p=>p.cons[0]||'—']];
+  const allSpecs=new Set(prods.flatMap(p=>Object.keys(p.sp)));
+  document.getElementById('cmpTable').innerHTML='<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse"><thead><tr>'+
+    '<th style="background:#f8fafc;font-size:12px;font-weight:600;color:#64748b;text-align:left;padding:9px 11px;border-bottom:1px solid #e2e8f0">Feature</th>'+
+    prods.map(pr=>'<th style="background:'+(pr.id===winner.id?'#eff6ff':'#f8fafc')+';color:'+(pr.id===winner.id?'#2563eb':'#64748b')+';font-size:12px;font-weight:700;padding:9px 11px;border-bottom:1px solid #e2e8f0;text-align:left">'+pr.n+(pr.id===winner.id?' &#127942;':'')+'</th>').join('')+
+    '</tr></thead><tbody>'+
+    rows.map(([lbl,fn])=>'<tr><td style="font-size:12px;font-weight:500;padding:8px 11px;border-bottom:1px solid #f1f5f9">'+lbl+'</td>'+prods.map(pr=>'<td style="font-size:12.5px;padding:8px 11px;border-bottom:1px solid #f1f5f9;background:'+(pr.id===winner.id?'#f8faff':'')+' ">'+fn(pr)+'</td>').join('')+'</tr>').join('')+
+    '<tr><td colspan="'+(prods.length+1)+'" style="background:#f8fafc;font-size:10.5px;font-weight:700;color:#64748b;padding:7px 11px">SPECIFICATIONS</td></tr>'+
+    [...allSpecs].map(k=>'<tr><td style="font-size:11.5px;color:#64748b;padding:7px 11px;border-bottom:1px solid #f1f5f9;font-weight:500">'+k+'</td>'+prods.map(pr=>'<td style="font-size:12px;padding:7px 11px;border-bottom:1px solid #f1f5f9">'+(pr.sp[k]||'—')+'</td>').join('')+'</tr>').join('')+
+    '</tbody></table></div>';
+  const runner=scored[1];
+  const pl={'val':'Best Value','qual':'Best Quality','price':'Lowest Price','sust':'Best Sustainability'};
+  document.getElementById('cmpSummary').style.display='block';
+  document.getElementById('cmpSummary').innerHTML='<div style="font-size:12px;font-weight:600;color:#2563eb;margin-bottom:6px">&#129302; AI Comparison Summary <span style="font-size:10px;color:#94a3b8;font-weight:400">(Demo Mode &mdash; local scoring algorithm)</span></div>'+
+    '<div style="font-size:13px;line-height:1.6;color:#374151">Based on <strong>'+(pl[activePrio]||activePrio)+'</strong> priority, <strong>'+winner.n+'</strong> is the recommended choice &mdash; '+winner.pros[0].toLowerCase()+', priced at '+fmt(winner.p)+'.'+
+    (runner?' Runner-up: <strong>'+runner.n+'</strong> ('+fmt(runner.p)+') &mdash; consider if '+runner.pros[0].toLowerCase()+'.':'')+
+    '<br><em style="font-size:11px;color:#94a3b8">This recommendation uses a local weighted scoring model. IBM watsonx.ai not connected.</em></div>';
+}
+
+/* ---- ASSISTANT ---- */
+const BOT=[
+  {k:['5g','smartphone','phone','25000','25k'],fn:q=>{
+    const m=P.filter(p=>p.c==='smartphones'&&p.p<=25000&&p.tags.includes('5G')).sort((a,b)=>b.val-a.val).slice(0,3);
+    return m.length?'Found '+m.length+' 5G smartphones under &#8377;25,000:<br><br>'+m.map((p,i)=>'<strong>'+(i+1)+'. '+p.n+'</strong> &mdash; '+fmt(p.p)+'<br>Rating: '+p.r+'&#9733; &bull; '+p.pros[0]).join('<br><br>')+'<br><br>&#127942; Top Pick: <strong>'+m[0].n+'</strong> (Value: '+m[0].val+'/100)<br><em style="color:#94a3b8;font-size:11.5px">Demo Mode &mdash; local recommendation engine</em>':'No 5G phones found under &#8377;25,000 in demo catalog.';
+  }},
+  {k:['laptop','programming','developer','coding','60000','60k'],fn:q=>{
+    const m=P.filter(p=>p.c==='laptops'&&p.p<=60000).sort((a,b)=>b.val-a.val).slice(0,3);
+    return 'Top laptops for programming under &#8377;60,000:<br><br>'+m.map((p,i)=>'<strong>'+(i+1)+'. '+p.n+'</strong> &mdash; '+fmt(p.p)+'<br>'+Object.entries(p.sp).slice(0,3).map(([k,v])=>k+': '+v).join(' &bull; ')).join('<br><br>')+'<br><br>&#127942; Recommendation: <strong>'+m[0].n+'</strong> &mdash; '+m[0].pros[0]+'<br><em style="color:#94a3b8;font-size:11.5px">Demo Mode</em>';
+  }},
+  {k:['eco','green','sustainable','environment'],fn:q=>{
+    const m=[...P].sort((a,b)=>b.sust-a.sust).slice(0,3);
+    return 'Top eco-friendly picks by sustainability score:<br><br>'+m.map((p,i)=>'<strong>'+(i+1)+'. '+p.n+'</strong> &mdash; Score '+p.sust+'/100<br>'+fmt(p.p)).join('<br><br>')+'<br><em style="color:#94a3b8;font-size:11.5px">Sustainability scores are demo estimates, not verified data.</em>';
+  }},
+  {k:['wait','sale','buy now','should i'],fn:q=>'&#128200; <strong>Buy now vs wait guidance:</strong><br><br>&bull; If discount &gt;20% &mdash; good time to buy<br>&bull; Major sale seasons: Flipkart Big Billion Days (Oct), Amazon Great Indian Festival (Oct), Republic Day (Jan)<br>&bull; Check price history in product details for recent trend<br><br>&#9888;&#65039; Cannot predict future prices. This is heuristic guidance only.<br><em style="color:#94a3b8;font-size:11.5px">Demo Mode &mdash; no real-time market data</em>'},
+  {k:['anc','noise cancel','headphone'],fn:q=>{
+    const m=P.filter(p=>p.c==='headphones'&&p.tags.some(t=>t.toLowerCase().includes('anc'))).sort((a,b)=>b.r-a.r);
+    return 'Best ANC headphones in catalog:<br><br>'+m.map((p,i)=>'<strong>'+(i+1)+'. '+p.n+'</strong> &mdash; '+fmt(p.p)+'<br>Rating: '+p.r+'&#9733; &bull; '+p.pros[0]).join('<br><br>')+'<br><br>&#127942; Best ANC: <strong>'+(m[0]?m[0].n:'Sony WH-1000XM4')+'</strong><br><em style="color:#94a3b8;font-size:11.5px">Demo Mode</em>';
+  }},
+  {k:['compare'],fn:q=>'To compare products:<br>1. Go to the <strong>Compare</strong> page<br>2. Search and add 2&ndash;4 products<br>3. Select your priority (Value / Quality / Price / Eco)<br>4. Click <strong>Compare Now</strong> for a side-by-side breakdown &amp; AI winner pick'},
+  {k:['smartwatch','watch','fitness'],fn:q=>{
+    const m=[...P].filter(p=>p.c==='smartwatches').sort((a,b)=>b.val-a.val).slice(0,3);
+    return 'Top smartwatches by value score:<br><br>'+m.map((p,i)=>'<strong>'+(i+1)+'. '+p.n+'</strong> &mdash; '+fmt(p.p)+'<br>'+p.pros[0]).join('<br><br>')+'<br><em style="color:#94a3b8;font-size:11.5px">Demo Mode</em>';
+  }}
+];
+function botR(q){
+  const ql=q.toLowerCase();
+  for(const r of BOT){if(r.k.some(k=>ql.includes(k)))return r.fn(q);}
+  const cats=['smartphones','laptops','headphones','smartwatches','home_appliances'];
+  for(const c of cats){
+    if(ql.includes(c.slice(0,-1))||ql.includes(c.replace('_',' '))){
+      const m=[...P].filter(p=>p.c===c).sort((a,b)=>b.val-a.val).slice(0,3);
+      return 'Top '+c+':<br><br>'+m.map((p,i)=>'<strong>'+(i+1)+'. '+p.n+'</strong> &mdash; '+fmt(p.p)+'<br>Value: '+p.val+'/100 &bull; Rating: '+p.r+'&#9733;').join('<br><br>')+'<br><em style="color:#94a3b8;font-size:11.5px">Demo Mode</em>';
+    }
+  }
+  return 'I can help you find:<br>&bull; Products within your budget<br>&bull; Best-rated items by category<br>&bull; Eco-friendly picks<br>&bull; Price timing advice<br>&bull; Head-to-head comparisons<br><br>Try: <em>"Best 5G smartphone under &#8377;25,000"</em><br><em style="color:#94a3b8;font-size:11.5px">Demo Mode &mdash; IBM watsonx.ai not connected. Set IBM_WATSONX_API_KEY to enable.</em>';
+}
+let chatH=[];
+function renderChat(){
+  const b=document.getElementById('chatBox');
+  b.innerHTML=chatH.map(m=>'<div class="chat-msg '+m.role+'"><div class="bubble '+(m.role==='user'?'user':'bot')+'">'+(m.role==='user'?m.c.replace(/</g,'&lt;').replace(/>/g,'&gt;'):m.c)+'</div></div>').join('');
+  b.scrollTop=b.scrollHeight;
+}
+function sendMsg(q){
+  chatH.push({role:'user',c:q});renderChat();
+  setTimeout(()=>{chatH.push({role:'bot',c:botR(q)});renderChat();},500);
+}
+function sendChat(){
+  const i=document.getElementById('chatIn');
+  const q=i.value.trim();
+  if(!q)return;i.value='';sendMsg(q);
+}
+function clearChat(){
+  chatH=[];
+  chatH.push({role:'bot',c:'&#128075; Hi! I\'m SmartCart AI assistant. Ask me anything about products, prices, comparisons, or deals.<br><em style="color:#94a3b8;font-size:11.5px">&#9889; Demo Mode &mdash; local recommendation engine active. IBM watsonx.ai not connected.</em>'});
+  renderChat();
+}
+clearChat();
+
+/* ---- TRACKER ---- */
+function populateTrkSel(){
+  const sel=document.getElementById('trkSel');
+  sel.innerHTML='<option value="">Select product...</option>'+P.map(p=>'<option value="'+p.id+'">'+p.n+' ('+fmt(p.p)+')</option>').join('');
+}
+populateTrkSel();
+function addTrack(){
+  const pid=document.getElementById('trkSel').value;
+  const t=parseFloat(document.getElementById('trkTarget').value);
+  if(!pid){toast2('Select a product','error');return;}
+  if(!t||t<=0){toast2('Enter valid target price','error');return;}
+  if(tracked.find(x=>x.pid===pid)){tracked.find(x=>x.pid===pid).target=t;save();renderTracker();toast2('Target updated','success');return;}
+  tracked.push({pid,target:t,at:new Date().toISOString()});
+  save();updateStats();renderTracker();toast2('Price tracking started!','success');
+}
+function removeTrack(pid){tracked=tracked.filter(x=>x.pid!==pid);save();updateStats();renderTracker();toast2('Removed from tracker','success');}
+function renderTracker(){
+  const el=document.getElementById('trkList');
+  if(!tracked.length){el.innerHTML='<div class="card" style="text-align:center;color:#94a3b8;padding:36px">No products tracked. Add one above to get started.</div>';return;}
+  el.innerHTML=tracked.map(t=>{
+    const pr=P.find(x=>x.id===t.pid);if(!pr)return '';
+    const met=pr.p<=t.target;
+    const avg=pr.ph.reduce((s,v)=>s+v,0)/pr.ph.length;
+    const rec=met?'&#10003; Buy Now &mdash; price meets your target!':pr.p<avg?'&#128077; Good time &mdash; price is below recent average.':'&#9203; Consider waiting &mdash; price is above recent average.';
+    const phH=pr.ph.map((v,i)=>'<div style="display:flex;align-items:center;gap:6px;margin-bottom:3px"><span style="font-size:10.5px;color:#94a3b8;width:26px">'+MO[i]+'</span><div class="pbar" style="flex:1"><div class="pfill" style="width:'+Math.round(v/pr.o*100)+'%;background:'+(v===pr.p?'#10b981':'#94a3b8')+'"></div></div><span style="font-size:11px;width:60px;text-align:right;font-weight:'+(v===pr.p?700:400)+'">'+fmt(v)+'</span></div>').join('');
+    return '<div class="card" style="margin-bottom:12px">'+
+      '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px"><div><div style="font-size:14px;font-weight:700">'+pr.n+'</div><div style="font-size:11.5px;color:#64748b">'+pr.b+' &bull; '+pr.c+'</div></div>'+
+      '<button onclick="removeTrack(\''+t.pid+'\')" style="border:none;background:#fee2e2;color:#dc2626;border-radius:6px;padding:4px 9px;cursor:pointer;font-size:12px">Remove</button></div>'+
+      '<div class="g3" style="margin-bottom:10px">'+
+      '<div style="background:#f8fafc;border-radius:7px;padding:9px;text-align:center"><div style="font-size:10.5px;color:#64748b">Current</div><div style="font-size:15px;font-weight:700">'+fmt(pr.p)+'</div></div>'+
+      '<div style="background:#f8fafc;border-radius:7px;padding:9px;text-align:center"><div style="font-size:10.5px;color:#64748b">Your Target</div><div style="font-size:15px;font-weight:700;color:'+(met?'#10b981':'#3b82f6')+'">'+fmt(t.target)+'</div></div>'+
+      '<div style="background:'+(met?'#f0fdf4':'#fef3c7')+';border-radius:7px;padding:9px;text-align:center"><div style="font-size:10.5px;color:#64748b">Status</div><div style="font-size:12px;font-weight:700;color:'+(met?'#15803d':'#b45309')+'">'+(met?'&#10003; Target Met!':'&#9203; Waiting...')+'</div></div></div>'+
+      '<div style="background:#eff6ff;border-radius:7px;padding:9px;margin-bottom:9px;font-size:12.5px;color:#1d4ed8">'+rec+'</div>'+
+      '<div style="font-size:11px;font-weight:600;color:#64748b;margin-bottom:5px">Price History <span style="font-weight:400;color:#94a3b8">(Demo &mdash; Synthetic Data)</span></div>'+phH+'</div>';
+  }).join('');
+}
+
+/* ---- REVIEWS ---- */
+function populateRevSel(){
+  const sel=document.getElementById('revSel');
+  if(sel.options.length>1)return;
+  P.forEach(pr=>{const o=document.createElement('option');o.value=pr.id;o.textContent=pr.n;sel.appendChild(o);});
+}
+function loadRev(){
+  const pid=document.getElementById('revSel').value;
+  if(!pid){document.getElementById('revContent').innerHTML='<div class="card" style="color:#94a3b8;text-align:center;padding:36px">Select a product above.</div>';return;}
+  const pr=P.find(x=>x.id===pid);
+  const revs=pr.revs;
+  const pos=revs.filter(r=>r.r>=4).length,neu=revs.filter(r=>r.r===3).length,neg=revs.filter(r=>r.r<=2).length,tot=revs.length;
+  const susp=(new Set(revs.map(r=>r.r)).size===1&&tot>1)?'<div style="background:#fef3c7;border:1px solid #fde68a;border-radius:8px;padding:11px;margin-bottom:12px"><strong>&#9888;&#65039; Potentially suspicious pattern</strong><br><span style="font-size:12px">All '+tot+' reviews have identical ratings. Heuristic flag only &mdash; these are demo reviews, not real customer feedback.</span></div>':'';
+  document.getElementById('revContent').innerHTML=susp+
+    '<div class="g2" style="margin-bottom:14px">'+
+    '<div class="card"><div style="font-weight:600;margin-bottom:11px">Sentiment Distribution</div>'+
+    '<div style="margin-bottom:7px"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px"><span>&#128522; Positive</span><strong style="color:#10b981">'+Math.round(pos/tot*100)+'%</strong></div><div class="pbar"><div class="pfill" style="width:'+Math.round(pos/tot*100)+'%;background:#10b981"></div></div></div>'+
+    '<div style="margin-bottom:7px"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px"><span>&#128528; Neutral</span><strong style="color:#f59e0b">'+Math.round(neu/tot*100)+'%</strong></div><div class="pbar"><div class="pfill" style="width:'+Math.round(neu/tot*100)+'%;background:#f59e0b"></div></div></div>'+
+    '<div><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px"><span>&#128545; Negative</span><strong style="color:#ef4444">'+Math.round(neg/tot*100)+'%</strong></div><div class="pbar"><div class="pfill" style="width:'+Math.round(neg/tot*100)+'%;background:#ef4444"></div></div></div>'+
+    '<div style="margin-top:10px;font-size:11px;color:#94a3b8">Confidence: Low (only '+tot+' demo reviews available)</div></div>'+
+    '<div class="card"><div style="font-weight:600;margin-bottom:10px">Common Themes</div>'+
+    '<div style="margin-bottom:8px"><div style="font-size:11.5px;font-weight:600;color:#15803d;margin-bottom:5px">Positive</div><div style="display:flex;flex-wrap:wrap;gap:5px">'+['Build quality','Performance','Value for money','Camera','Battery'].map(t=>'<span style="background:#dcfce7;color:#15803d;font-size:10.5px;padding:2px 7px;border-radius:4px;font-weight:500">'+t+'</span>').join('')+'</div></div>'+
+    '<div><div style="font-size:11.5px;font-weight:600;color:#dc2626;margin-bottom:5px">Negative</div><div style="display:flex;flex-wrap:wrap;gap:5px">'+['No charger','Plastic build','Average calls'].map(t=>'<span style="background:#fee2e2;color:#dc2626;font-size:10.5px;padding:2px 7px;border-radius:4px;font-weight:500">'+t+'</span>').join('')+'</div></div></div></div>'+
+    '<div class="card"><div style="font-weight:600;margin-bottom:10px">Sample Reviews <span style="font-size:11px;font-weight:400;color:#94a3b8">(Demo &mdash; not real customer data)</span></div>'+
+    revs.map(rv=>'<div style="padding:8px 0;border-bottom:1px solid #f1f5f9"><div style="display:flex;justify-content:space-between;margin-bottom:3px"><strong style="font-size:12.5px">'+rv.a+'</strong><span style="font-size:11.5px;color:#f59e0b">'+stars(rv.r)+' '+rv.r+'/5</span></div><p style="font-size:12.5px;color:#374151;margin:0 0 4px">'+rv.t+'</p><span style="background:'+(rv.v?'#dcfce7':'#f1f5f9')+';color:'+(rv.v?'#15803d':'#64748b')+';font-size:10px;padding:2px 6px;border-radius:3px;font-weight:500">'+(rv.v?'&#10003; Verified':'Unverified')+' &bull; Demo Review</span></div>').join('')+'</div>';
+}
+
+/* ---- PULSE ---- */
+function renderPulse(){
+  const cats=['smartphones','laptops','headphones','smartwatches','home_appliances'];
+  const lbl={smartphones:'&#128241; Smartphones',laptops:'&#128187; Laptops',headphones:'&#127911; Headphones',smartwatches:'Smartwatches',home_appliances:'&#127968; Appliances'};
+  const cnt=cats.map(c=>P.filter(p=>p.c===c).length);
+  const avg=cats.map(c=>{const ps=P.filter(p=>p.c===c);return Math.round(ps.reduce((s,p)=>s+p.p,0)/ps.length);});
+  const mc=Math.max(...cnt),mp=Math.max(...avg);
+  document.getElementById('pulCat').innerHTML=cats.map((c,i)=>'<div style="margin-bottom:7px"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px"><span>'+lbl[c]+'</span><strong>'+cnt[i]+'</strong></div><div class="pbar"><div class="pfill" style="width:'+Math.round(cnt[i]/mc*100)+'%;background:#3b82f6"></div></div></div>').join('');
+  document.getElementById('pulPrice').innerHTML=cats.map((c,i)=>'<div style="margin-bottom:7px"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px"><span>'+lbl[c]+'</span><strong>'+fmt(avg[i])+'</strong></div><div class="pbar"><div class="pfill" style="width:'+Math.round(avg[i]/mp*100)+'%;background:#7c3aed"></div></div></div>').join('');
+  const top8=[...P].sort((a,b)=>b.val-a.val).slice(0,8);
+  document.getElementById('pulVal').innerHTML=top8.map((pr,i)=>'<div style="display:flex;align-items:center;gap:9px;margin-bottom:7px"><span style="font-size:11px;font-weight:700;color:#94a3b8;width:18px">'+(i+1)+'</span><div style="flex:1"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px"><span style="font-weight:500">'+pr.n+'</span><strong style="color:#7c3aed">'+pr.val+'</strong></div><div class="pbar"><div class="pfill" style="width:'+pr.val+'%;background:'+(i===0?'#f59e0b':i<3?'#7c3aed':'#3b82f6')+'"></div></div></div></div>').join('');
+  const bkts=[{l:'Low (0-40)',min:0,max:40,col:'#ef4444'},{l:'Mid (41-70)',min:41,max:70,col:'#f59e0b'},{l:'High (71-100)',min:71,max:100,col:'#10b981'}];
+  document.getElementById('pulSust').innerHTML=bkts.map(bk=>{const c=P.filter(p=>p.sust>=bk.min&&p.sust<=bk.max).length;return'<div style="margin-bottom:7px"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px"><span>'+bk.l+'</span><strong>'+c+' products</strong></div><div class="pbar"><div class="pfill" style="width:'+Math.round(c/P.length*100)+'%;background:'+bk.col+'"></div></div></div>';}).join('');
+}
+
+/* ---- SHOPPING LIST ---- */
+function addToList(id){
+  const pr=P.find(x=>x.id===id);if(!pr)return;
+  if(myList.find(x=>x.pid===id)){toast2('Already in your list','info');return;}
+  myList.push({pid:id,qty:1,done:false});
+  save();updateStats();
+  if(document.getElementById('pg-list').classList.contains('active'))renderList();
+  toast2(pr.n+' added to shopping list','success');
+}
+function removeFromList(id){myList=myList.filter(x=>x.pid!==id);save();updateStats();renderList();toast2('Removed from list','success');}
+function toggleDone(id){const i=myList.find(x=>x.pid===id);if(i){i.done=!i.done;save();renderList();}}
+function listSug(){
+  const q=document.getElementById('listQ').value.toLowerCase();
+  const box=document.getElementById('listSugBox');
+  if(!q){box.innerHTML='';return;}
+  const hits=P.filter(p=>(p.n+' '+p.b).toLowerCase().includes(q)).slice(0,5);
+  box.innerHTML=hits.map(pr=>'<div style="padding:7px 11px;cursor:pointer;border:1px solid #e2e8f0;border-radius:7px;margin-bottom:4px;font-size:13px;background:#fff" onmouseenter="this.style.background=\'#f1f5f9\'" onmouseleave="this.style.background=\'#fff\'" onclick="addToList(\''+pr.id+'\');document.getElementById(\'listQ\').value=\'\';document.getElementById(\'listSugBox\').innerHTML=\'\'"><strong>'+pr.n+'</strong> <span style="color:#64748b">'+fmt(pr.p)+'</span></div>').join('');
+}
+function renderList(){
+  const el=document.getElementById('listItems');
+  const budget=parseFloat(document.getElementById('budgetIn').value)||100000;
+  if(!myList.length){
+    el.innerHTML='<div class="card" style="text-align:center;color:#94a3b8;padding:36px">Your shopping list is empty. Search above to add products.</div>';
+    document.getElementById('lTotal').textContent=fmt(0);
+    document.getElementById('lRemain').textContent=fmt(budget);
+    document.getElementById('lRemain').style.color='#10b981';
+    document.getElementById('lDone').textContent='0/0';return;
+  }
+  let total=0,done=0;const cats={};
+  myList.forEach(item=>{
+    const pr=P.find(x=>x.id===item.pid);if(!pr)return;
+    if(!cats[pr.c])cats[pr.c]=[];
+    cats[pr.c].push({item,pr});
+    if(!item.done)total+=pr.p;
+    if(item.done)done++;
+  });
+  document.getElementById('lTotal').textContent=fmt(total);
+  const rem=budget-total;
+  document.getElementById('lRemain').textContent=fmt(Math.abs(rem));
+  document.getElementById('lRemain').style.color=rem>=0?'#10b981':'#ef4444';
+  document.getElementById('lDone').textContent=done+'/'+myList.length;
+  const lbl={smartphones:'&#128241; Smartphones',laptops:'&#128187; Laptops',headphones:'&#127911; Headphones',smartwatches:'Smartwatches',home_appliances:'&#127968; Appliances'};
+  el.innerHTML=Object.entries(cats).map(([cat,items])=>'<div class="card" style="margin-bottom:12px"><div style="font-weight:700;font-size:14px;color:#3b82f6;margin-bottom:10px">'+(lbl[cat]||cat)+'</div>'+items.map(({item,pr})=>'<div style="display:flex;align-items:center;gap:9px;padding:7px 0;border-bottom:1px solid #f1f5f9"><input type="checkbox" '+(item.done?'checked':'')+' onclick="toggleDone(\''+item.pid+'\')" style="width:15px;height:15px;cursor:pointer"/><img src="'+pr.img+'" style="width:32px;height:32px;object-fit:contain;border-radius:5px;border:1px solid #e2e8f0"/><div style="flex:1"><div style="font-size:13px;font-weight:600;'+(item.done?'text-decoration:line-through;color:#94a3b8':'')+'">'+pr.n+'</div><div style="font-size:11.5px;color:#64748b">'+fmt(pr.p)+' &bull; '+pr.b+'</div></div><button onclick="removeFromList(\''+item.pid+'\')" style="border:none;background:#fee2e2;color:#dc2626;padding:4px 8px;border-radius:5px;cursor:pointer;font-size:11.5px">&#10005;</button></div>').join('')+'</div>').join('');
+}
+
+function qTrack(id){
+  const pr=P.find(x=>x.id===id);
+  const t=prompt('Track: '+pr.n+'\nCurrent price: '+fmt(pr.p)+'\n\nEnter your target price (INR):');
+  if(!t)return;
+  const n=parseFloat(t);
+  if(!n||n<=0){toast2('Invalid price','error');return;}
+  if(tracked.find(x=>x.pid===id)){tracked.find(x=>x.pid===id).target=n;save();toast2('Target price updated','success');return;}
+  tracked.push({pid:id,target:n,at:new Date().toISOString()});
+  save();updateStats();toast2('Tracking '+pr.n+' — alert at '+fmt(n),'success');
+}
+</script>
+</body>
+</html>
