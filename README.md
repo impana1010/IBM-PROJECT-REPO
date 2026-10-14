@@ -98,7 +98,7 @@ npm install
 npm run dev
 ```
 
-Frontend available at **http://localhost:5173**
+Frontend available at **martcart/index.html**
 
 ---
 
