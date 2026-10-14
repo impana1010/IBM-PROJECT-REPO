@@ -91,7 +91,1364 @@ API docs available at **http://localhost:8000/docs**
 
 ### Frontend
 
-Frontend available at **https://xxxxx.netlify.app**
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>SmartCart AI — Shop Smarter. Save More. Choose Better.</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:system-ui,-apple-system,"Segoe UI",sans-serif;background:#f8fafc;color:#1e293b;font-size:14px;line-height:1.55}
+.demo-bar{background:linear-gradient(90deg,#fef3c7,#fde68a);border-bottom:1px solid #fcd34d;padding:7px 20px;text-align:center;font-size:12px;color:#78350f;position:fixed;top:0;left:0;right:0;z-index:400;font-weight:600;letter-spacing:.1px}
+.sidebar{position:fixed;top:36px;left:0;width:228px;height:calc(100vh - 36px);background:#fff;border-right:1px solid #e2e8f0;display:flex;flex-direction:column;z-index:200;overflow-y:auto}
+.main{margin-left:228px;padding:28px 28px 48px;padding-top:62px;min-height:100vh}
+@media(max-width:900px){.sidebar{transform:translateX(-100%);transition:.25s}.sidebar.open{transform:translateX(0)}.main{margin-left:0;padding:16px;padding-top:58px}}
+.logo-wrap{padding:16px 14px;border-bottom:1px solid #f1f5f9;display:flex;align-items:center;gap:10px}
+.logo-icon{width:34px;height:34px;background:linear-gradient(135deg,#3b82f6,#6366f1);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;box-shadow:0 2px 8px rgba(59,130,246,.3)}
+.logo-name{font-weight:800;font-size:14px;color:#1e293b;line-height:1.2}
+.logo-tag{font-size:10px;color:#94a3b8}
+.nav-section{padding:10px 8px 4px;font-size:10px;font-weight:700;color:#cbd5e1;text-transform:uppercase;letter-spacing:1px;margin-top:4px}
+.nav-item{display:flex;align-items:center;gap:9px;padding:9px 14px;border-radius:9px;cursor:pointer;font-size:13px;color:#64748b;transition:.15s;margin-bottom:1px;user-select:none}
+.nav-item:hover{background:#f8fafc;color:#1e293b}
+.nav-item.active{background:linear-gradient(135deg,#eff6ff,#f0f4ff);color:#2563eb;font-weight:700;box-shadow:inset 2px 0 0 #3b82f6}
+.nav-icon{font-size:15px;width:18px;text-align:center;flex-shrink:0}
+.nav-badge{margin-left:auto;background:#ef4444;color:#fff;font-size:10px;font-weight:700;padding:1px 6px;border-radius:999px;min-width:18px;text-align:center}
+.sidebar-foot{padding:12px 14px;border-top:1px solid #f1f5f9;font-size:10.5px;color:#94a3b8;margin-top:auto}
+.mobile-nav{display:none;position:fixed;top:36px;left:0;right:0;height:44px;background:#fff;border-bottom:1px solid #e2e8f0;z-index:190;align-items:center;padding:0 14px;gap:10px}
+@media(max-width:900px){.mobile-nav{display:flex}}
+.hamburger{border:none;background:none;cursor:pointer;font-size:20px;padding:4px;color:#64748b}
+.mobile-title{font-weight:700;font-size:13.5px;color:#1e293b}
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:190}
+.overlay.open{display:block}
+.card{background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:20px}
+.card-sm{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:14px}
+.stat-card{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:16px;text-align:center}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.g4{display:grid;grid-template-columns:repeat(auto-fill,minmax(215px,1fr));gap:14px}
+.g4w{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px}
+@media(max-width:640px){.g2,.g3{grid-template-columns:1fr}.g4,.g4w{grid-template-columns:1fr 1fr}}
+@media(max-width:400px){.g4,.g4w{grid-template-columns:1fr}}
+.section-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.section-title{font-size:15px;font-weight:700;color:#1e293b}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:none;border-radius:9px;padding:9px 18px;font-weight:600;cursor:pointer;font-size:13px;transition:.15s;font-family:inherit}
+.btn:active{transform:scale(.97)}
+.btn-p{background:linear-gradient(135deg,#3b82f6,#6366f1);color:#fff;box-shadow:0 2px 8px rgba(59,130,246,.3)}
+.btn-p:hover{background:linear-gradient(135deg,#2563eb,#4f46e5);box-shadow:0 4px 14px rgba(59,130,246,.4)}
+.btn-s{background:#f1f5f9;color:#475569;border:1px solid #e2e8f0}
+.btn-s:hover{background:#e2e8f0;color:#1e293b}
+.btn-g{background:linear-gradient(135deg,#10b981,#059669);color:#fff;box-shadow:0 2px 8px rgba(16,185,129,.3)}
+.btn-g:hover{background:linear-gradient(135deg,#059669,#047857)}
+.btn-r{background:#fee2e2;color:#dc2626;border:1px solid #fecaca}
+.btn-r:hover{background:#fecaca}
+.btn-sm{padding:5px 12px;font-size:12px;border-radius:7px}
+.btn-xs{padding:3px 9px;font-size:11.5px;border-radius:6px}
+.input{width:100%;border:1px solid #e2e8f0;border-radius:9px;padding:9px 12px;font-size:13px;outline:none;background:#fff;font-family:inherit;transition:.15s;color:#1e293b}
+.input:focus{border-color:#3b82f6;box-shadow:0 0 0 3px rgba(59,130,246,.12)}
+select.input{padding:8px 10px;cursor:pointer}
+textarea.input{resize:vertical;min-height:72px}
+.badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;padding:3px 9px;border-radius:999px;white-space:nowrap}
+.badge-blue{background:#dbeafe;color:#1d4ed8}
+.badge-green{background:#dcfce7;color:#15803d}
+.badge-amber{background:#fef3c7;color:#92400e}
+.badge-red{background:#fee2e2;color:#dc2626}
+.badge-purple{background:#f3e8ff;color:#7c3aed}
+.badge-gray{background:#f1f5f9;color:#64748b}
+.tag{display:inline-block;font-size:11px;padding:2px 8px;border-radius:5px;font-weight:500;border:1px solid transparent}
+.pbar{height:7px;background:#f1f5f9;border-radius:4px;overflow:hidden}
+.pfill{height:100%;border-radius:4px;transition:.4s ease}
+.page{display:none;animation:fadeIn .18s ease}.page.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+.page-header{margin-bottom:24px}
+.page-header h1{font-size:21px;font-weight:800;color:#1e293b}
+.page-header p{color:#64748b;font-size:13.5px;margin-top:3px}
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(15,23,42,.55);z-index:500;align-items:flex-start;justify-content:center;padding:48px 16px 40px;overflow-y:auto;backdrop-filter:blur(2px)}
+.modal-bg.open{display:flex;animation:fadeIn .18s ease}
+.modal-inner{background:#fff;border-radius:16px;padding:26px;max-width:680px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.18)}
+.pcard{background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:16px;cursor:pointer;transition:.2s;display:flex;flex-direction:column;gap:0}
+.pcard:hover{border-color:#93c5fd;box-shadow:0 6px 20px rgba(59,130,246,.12);transform:translateY(-2px)}
+.pcard-img{width:80px;height:80px;object-fit:contain;border-radius:10px;margin:0 auto 10px;display:block;background:#f8fafc}
+.pcard-brand{font-size:10.5px;color:#94a3b8;font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+.pcard-name{font-size:13px;font-weight:700;color:#1e293b;margin:3px 0 6px;line-height:1.35}
+.pcard-rating{font-size:12px;color:#f59e0b;margin-bottom:6px}
+.pcard-price{display:flex;align-items:baseline;gap:7px;margin-bottom:8px}
+.pcard-now{font-size:16px;font-weight:800;color:#1e293b}
+.pcard-orig{font-size:11.5px;color:#94a3b8;text-decoration:line-through}
+.pcard-disc{background:#dcfce7;color:#15803d;font-size:10.5px;padding:2px 7px;border-radius:5px;font-weight:700}
+.pcard-actions{display:flex;gap:2px;margin-top:auto;padding-top:8px}
+.pcard-act{flex:1;padding:6px 3px;font-size:11px;font-weight:700;cursor:pointer;border:none;transition:.15s}
+.pcard-act:first-child{border-radius:7px 0 0 7px}
+.pcard-act:last-child{border-radius:0 7px 7px 0}
+.pcard-act:hover{filter:brightness(.92)}
+.chat-wrap{display:flex;flex-direction:column;height:460px}
+.chat-msgs{flex:1;overflow-y:auto;padding:4px 0;display:flex;flex-direction:column;gap:10px}
+.chat-msg{display:flex;gap:8px;align-items:flex-end}
+.chat-msg.user{flex-direction:row-reverse}
+.bubble{max-width:78%;padding:11px 15px;border-radius:12px;font-size:13px;line-height:1.55}
+.bubble.user{background:linear-gradient(135deg,#3b82f6,#6366f1);color:#fff;border-radius:12px 12px 2px 12px}
+.bubble.bot{background:#fff;border:1px solid #e2e8f0;color:#1e293b;border-radius:12px 12px 12px 2px;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.chat-avatar{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.chat-input-row{display:flex;gap:8px;padding-top:12px;border-top:1px solid #f1f5f9;margin-top:8px}
+#toast-container{position:fixed;bottom:24px;right:24px;z-index:999;display:flex;flex-direction:column;gap:8px;pointer-events:none;max-width:320px}
+.toast{background:#1e293b;color:#fff;padding:12px 16px;border-radius:10px;font-size:13px;font-weight:500;box-shadow:0 6px 20px rgba(0,0,0,.2);pointer-events:all;display:flex;align-items:center;gap:8px;animation:toastIn .2s ease}
+@keyframes toastIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.toast-success{border-left:3px solid #10b981}
+.toast-error{border-left:3px solid #ef4444}
+.toast-info{border-left:3px solid #3b82f6}
+.cmp-table{width:100%;border-collapse:collapse;min-width:560px}
+.cmp-table th{background:#f8fafc;font-size:12px;font-weight:700;color:#64748b;text-align:left;padding:10px 13px;border-bottom:2px solid #e2e8f0;position:sticky;top:0}
+.cmp-table th.winner{background:#eff6ff;color:#2563eb}
+.cmp-table td{padding:9px 13px;font-size:13px;border-bottom:1px solid #f1f5f9;vertical-align:top}
+.cmp-table tr:hover td{background:#fafbff}
+.cmp-table td.winner{background:#f8faff}
+.score-wrap{display:flex;align-items:center;gap:8px}
+.score-num{font-size:13px;font-weight:700;width:34px;text-align:right;flex-shrink:0}
+.divider{height:1px;background:#f1f5f9;margin:16px 0}
+.empty-state{text-align:center;padding:48px 20px;color:#94a3b8}
+.empty-state .es-icon{font-size:40px;margin-bottom:12px}
+.empty-state .es-msg{font-size:14px;font-weight:500}
+.empty-state .es-sub{font-size:12.5px;margin-top:4px}
+.search-row{display:flex;gap:8px;margin-bottom:16px}
+.filter-panel{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:14px}
+.filter-label{font-size:11.5px;font-weight:700;color:#64748b;display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px}
+.chip-row{display:flex;flex-wrap:wrap;gap:6px}
+.chip{padding:4px 11px;border-radius:999px;font-size:12px;font-weight:500;cursor:pointer;border:1.5px solid #e2e8f0;color:#64748b;background:#fff;transition:.12s}
+.chip.on{border-color:#3b82f6;background:#eff6ff;color:#2563eb}
+input[type=range]{width:100%;accent-color:#3b82f6}
+.shimmer{background:linear-gradient(90deg,#f1f5f9 25%,#e2e8f0 50%,#f1f5f9 75%);background-size:200% 100%;animation:shimmer 1.2s infinite}
+@keyframes shimmer{0%{background-position:200%}100%{background-position:-200%}}
+.row{display:flex;align-items:center;gap:10px}
+.flex1{flex:1}
+details>summary{cursor:pointer;font-size:12.5px;font-weight:700;color:#64748b;padding:4px 0;user-select:none}
+details[open]>summary{color:#3b82f6}
+</style>
+</head>
+<body>
+
+<div class="demo-bar">⚡ SmartCart AI &nbsp;·&nbsp; Demo Mode &nbsp;·&nbsp; 25 synthetic products &nbsp;·&nbsp; No backend required &nbsp;·&nbsp; IBM watsonx.ai not connected</div>
+
+<aside class="sidebar" id="sidebar">
+  <div class="logo-wrap">
+    <div class="logo-icon">🛒</div>
+    <div>
+      <div class="logo-name">SmartCart AI</div>
+      <div class="logo-tag">Shop Smarter. Save More.</div>
+    </div>
+  </div>
+  <nav style="padding:8px 8px 0;flex:1">
+    <div class="nav-section">Main</div>
+    <div class="nav-item active" onclick="nav('dashboard',this)"><span class="nav-icon">🏠</span> Dashboard</div>
+    <div class="nav-item" onclick="nav('search',this)"><span class="nav-icon">🔍</span> AI Search</div>
+    <div class="nav-item" onclick="nav('compare',this)"><span class="nav-icon">⚖️</span> Compare <span class="nav-badge" id="cmp-badge" style="display:none">0</span></div>
+    <div class="nav-section">Tools</div>
+    <div class="nav-item" onclick="nav('assistant',this)"><span class="nav-icon">💬</span> AI Assistant</div>
+    <div class="nav-item" onclick="nav('tracker',this)"><span class="nav-icon">📉</span> Price Tracker</div>
+    <div class="nav-item" onclick="nav('reviews',this)"><span class="nav-icon">⭐</span> Reviews</div>
+    <div class="nav-section">Analytics</div>
+    <div class="nav-item" onclick="nav('pulse',this)"><span class="nav-icon">📊</span> Shopping Pulse</div>
+    <div class="nav-item" onclick="nav('list',this)"><span class="nav-icon">📋</span> My List <span class="nav-badge" id="list-badge" style="display:none">0</span></div>
+    <div class="nav-item" onclick="nav('settings',this)"><span class="nav-icon">⚙️</span> Settings</div>
+  </nav>
+  <div class="sidebar-foot">SmartCart AI v1.0 &nbsp;·&nbsp; Demo Mode<br>All data is synthetic sample data.</div>
+</aside>
+
+<div class="mobile-nav">
+  <button class="hamburger" onclick="toggleSidebar()" aria-label="Menu">☰</button>
+  <div class="logo-icon" style="width:26px;height:26px;font-size:13px">🛒</div>
+  <span class="mobile-title">SmartCart AI</span>
+</div>
+<div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+
+<main class="main" id="main-content">
+
+<!-- DASHBOARD -->
+<div id="pg-dashboard" class="page active">
+  <div class="page-header">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px">
+      <div>
+        <h1 id="greet-msg">Good morning, Shopper 👋</h1>
+        <p id="date-str" style="color:#64748b;font-size:12.5px;margin-top:2px"></p>
+      </div>
+      <span class="badge badge-amber">⚡ Demo Mode Active</span>
+    </div>
+  </div>
+  <div class="card" style="margin-bottom:18px">
+    <div style="font-size:11px;text-transform:uppercase;letter-spacing:.8px;color:#94a3b8;margin-bottom:9px;font-weight:700">🔍 AI Product Search</div>
+    <div class="search-row">
+      <input class="input" id="dash-search" placeholder='Try: "best 5G smartphone under ₹25,000" or "laptop for programming"' style="flex:1" onkeydown="if(event.key==='Enter')dashSearch()"/>
+      <button class="btn btn-p" onclick="dashSearch()">Search</button>
+    </div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:10px">
+      <span style="font-size:12px;color:#94a3b8;align-self:center">Try:</span>
+      <button class="btn btn-s btn-xs" onclick="dashQ('5G smartphone under 25000')">📱 5G Phone ₹25K</button>
+      <button class="btn btn-s btn-xs" onclick="dashQ('laptop for programming under 60000')">💻 Dev Laptop</button>
+      <button class="btn btn-s btn-xs" onclick="dashQ('noise cancelling headphones')">🎧 ANC Headphones</button>
+      <button class="btn btn-s btn-xs" onclick="dashQ('smartwatch fitness')">⌚ Fitness Watch</button>
+      <button class="btn btn-s btn-xs" onclick="dashQ('home appliance energy efficient')">🏠 Appliances</button>
+    </div>
+  </div>
+  <div class="g3" id="dash-stats" style="margin-bottom:18px"></div>
+  <div class="card" style="margin-bottom:18px">
+    <div class="section-title" style="margin-bottom:12px">⚡ Quick Actions</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn btn-p btn-sm" onclick="nav('compare',null)">⚖️ Compare Products</button>
+      <button class="btn btn-s btn-sm" onclick="nav('search',null)">🔖 Browse Deals</button>
+      <button class="btn btn-s btn-sm" onclick="nav('list',null)">📋 My Shopping List</button>
+      <button class="btn btn-s btn-sm" onclick="nav('tracker',null)">📉 Price Tracker</button>
+      <button class="btn btn-s btn-sm" onclick="nav('pulse',null)">📊 Shopping Pulse</button>
+    </div>
+  </div>
+  <div class="section-head">
+    <span class="section-title">🔥 Trending — Best Deals Right Now</span>
+    <span class="badge badge-gray">Demo Data</span>
+  </div>
+  <div class="g4" id="dash-trending" style="margin-bottom:22px"></div>
+  <div class="section-head">
+    <span class="section-title">⭐ Recommended for You</span>
+    <span class="badge badge-blue">AI Picks · Demo</span>
+  </div>
+  <div class="g4" id="dash-recs"></div>
+</div>
+
+<!-- SEARCH -->
+<div id="pg-search" class="page">
+  <div class="page-header">
+    <h1>🔍 AI Product Search</h1>
+    <p>Natural language search with smart filters. All results from demo catalog.</p>
+  </div>
+  <div class="card" style="margin-bottom:16px">
+    <div class="search-row">
+      <input class="input" id="search-input" placeholder='e.g. "best laptop under ₹50,000 for students"' style="flex:1" onkeydown="if(event.key==='Enter')doSearch()"/>
+      <button class="btn btn-p" onclick="doSearch()">Search</button>
+      <button class="btn btn-s btn-sm" onclick="clearSearch()" title="Clear">✕</button>
+    </div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px">
+      <span style="font-size:12px;color:#94a3b8">Quick:</span>
+      <button class="btn btn-s btn-xs" onclick="quickSearch('5G smartphone under 25000')">📱 5G ₹25K</button>
+      <button class="btn btn-s btn-xs" onclick="quickSearch('laptop gaming')">💻 Gaming Laptop</button>
+      <button class="btn btn-s btn-xs" onclick="quickSearch('wireless headphones')">🎧 Wireless Audio</button>
+      <button class="btn btn-s btn-xs" onclick="quickSearch('smartwatch health')">⌚ Health Watch</button>
+      <button class="btn btn-s btn-xs" onclick="quickSearch('energy efficient appliance')">🏠 Green Appliance</button>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:220px 1fr;gap:16px;align-items:start">
+    <div class="filter-panel" style="position:sticky;top:64px">
+      <div style="font-weight:700;font-size:13px;color:#1e293b;margin-bottom:2px">Filters</div>
+      <div>
+        <span class="filter-label">Category</span>
+        <select class="input" id="f-cat" onchange="applyFilters()">
+          <option value="">All Categories</option>
+          <option value="smartphones">📱 Smartphones</option>
+          <option value="laptops">💻 Laptops</option>
+          <option value="headphones">🎧 Headphones</option>
+          <option value="smartwatches">⌚ Smartwatches</option>
+          <option value="home_appliances">🏠 Home Appliances</option>
+        </select>
+      </div>
+      <div>
+        <span class="filter-label">Max Price (₹)</span>
+        <input class="input" type="number" id="f-max" placeholder="e.g. 30000" onchange="applyFilters()"/>
+      </div>
+      <div>
+        <span class="filter-label">Min Rating</span>
+        <select class="input" id="f-rating" onchange="applyFilters()">
+          <option value="">Any Rating</option>
+          <option value="4">4★ &amp; above</option>
+          <option value="4.3">4.3★ &amp; above</option>
+          <option value="4.5">4.5★ &amp; above</option>
+        </select>
+      </div>
+      <div>
+        <span class="filter-label">Sort By</span>
+        <select class="input" id="f-sort" onchange="applyFilters()">
+          <option value="val">Value Score</option>
+          <option value="pa">Price: Low → High</option>
+          <option value="pd">Price: High → Low</option>
+          <option value="rating">Rating</option>
+          <option value="disc">Discount %</option>
+        </select>
+      </div>
+      <div>
+        <span class="filter-label">Features</span>
+        <div class="chip-row" id="feature-chips">
+          <span class="chip" onclick="toggleChip(this,'5G')">5G</span>
+          <span class="chip" onclick="toggleChip(this,'ANC')">ANC</span>
+          <span class="chip" onclick="toggleChip(this,'AMOLED')">AMOLED</span>
+          <span class="chip" onclick="toggleChip(this,'Fast Charge')">Fast Charge</span>
+          <span class="chip" onclick="toggleChip(this,'Gaming')">Gaming</span>
+          <span class="chip" onclick="toggleChip(this,'Budget')">Budget</span>
+          <span class="chip" onclick="toggleChip(this,'Premium')">Premium</span>
+          <span class="chip" onclick="toggleChip(this,'SSD')">SSD</span>
+        </div>
+      </div>
+      <button class="btn btn-s btn-sm" onclick="clearFilters()" style="width:100%">✕ Clear All Filters</button>
+    </div>
+    <div>
+      <div id="search-meta" style="font-size:12.5px;color:#64748b;margin-bottom:12px;min-height:20px"></div>
+      <div class="g4" id="search-results"></div>
+    </div>
+  </div>
+</div>
+
+<!-- COMPARE -->
+<div id="pg-compare" class="page">
+  <div class="page-header">
+    <h1>⚖️ Product Comparison</h1>
+    <p>Add up to 4 products and compare them side-by-side.</p>
+  </div>
+  <div class="card" style="margin-bottom:14px">
+    <div style="font-weight:700;margin-bottom:10px">Add Product to Compare</div>
+    <div style="position:relative;display:inline-block;width:100%;max-width:420px">
+      <input class="input" id="cmp-input" placeholder="Type product name to search..." oninput="cmpAutocomplete()" autocomplete="off"/>
+      <div id="cmp-dropdown" style="position:absolute;top:100%;left:0;right:0;background:#fff;border:1px solid #e2e8f0;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.1);z-index:50;margin-top:4px;display:none;max-height:220px;overflow-y:auto"></div>
+    </div>
+    <div id="cmp-chips" style="display:flex;gap:7px;flex-wrap:wrap;margin-top:12px;min-height:32px"></div>
+  </div>
+  <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:16px">
+    <span style="font-size:13px;font-weight:700">Priority:</span>
+    <button class="btn btn-s btn-sm" id="prio-val" onclick="setPrio('val')">💰 Best Value</button>
+    <button class="btn btn-s btn-sm" id="prio-qual" onclick="setPrio('qual')">🏆 Best Quality</button>
+    <button class="btn btn-s btn-sm" id="prio-price" onclick="setPrio('price')">🏷️ Lowest Price</button>
+    <button class="btn btn-s btn-sm" id="prio-sust" onclick="setPrio('sust')">🌿 Eco-Friendly</button>
+    <button class="btn btn-p btn-sm" onclick="runCompare()" style="margin-left:auto">Compare Now →</button>
+  </div>
+  <div id="cmp-table-wrap"></div>
+  <div id="cmp-ai-summary" style="display:none" class="card" style="margin-top:14px;border-left:4px solid #3b82f6"></div>
+</div>
+
+<!-- ASSISTANT -->
+<div id="pg-assistant" class="page">
+  <div class="page-header">
+    <h1>💬 AI Shopping Assistant</h1>
+    <p>Ask anything about products, prices, or comparisons. Powered by local demo engine.</p>
+  </div>
+  <div class="card" style="margin-bottom:12px">
+    <div style="font-size:11.5px;font-weight:700;color:#64748b;margin-bottom:9px">💡 SUGGESTED PROMPTS</div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap">
+      <button class="btn btn-s btn-xs" onclick="askBot('Best 5G smartphone under ₹25,000')">📱 5G phone ₹25K</button>
+      <button class="btn btn-s btn-xs" onclick="askBot('Best laptop for programming under ₹60,000')">💻 Dev laptop ₹60K</button>
+      <button class="btn btn-s btn-xs" onclick="askBot('Top eco-friendly products')">🌿 Eco picks</button>
+      <button class="btn btn-s btn-xs" onclick="askBot('Should I buy now or wait for a sale?')">⏰ Buy now or wait?</button>
+      <button class="btn btn-s btn-xs" onclick="askBot('Best noise cancelling headphones')">🎧 Best ANC</button>
+      <button class="btn btn-s btn-xs" onclick="askBot('Compare Samsung and OnePlus phones')">⚖️ Compare phones</button>
+      <button class="btn btn-s btn-xs" onclick="askBot('Recommend smartwatch under ₹15,000')">⌚ Watch ₹15K</button>
+    </div>
+  </div>
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <div style="font-size:12px;font-weight:700;color:#64748b">CONVERSATION <span class="badge badge-amber" style="margin-left:6px">Demo Mode</span></div>
+      <button class="btn btn-s btn-xs" onclick="clearChat()">🗑 Clear</button>
+    </div>
+    <div class="chat-wrap">
+      <div class="chat-msgs" id="chat-box"></div>
+      <div class="chat-input-row">
+        <input class="input" id="chat-input" placeholder="Ask me anything about products..." onkeydown="if(event.key==='Enter')sendChat()"/>
+        <button class="btn btn-p btn-sm" onclick="sendChat()">Send ➤</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TRACKER -->
+<div id="pg-tracker" class="page">
+  <div class="page-header">
+    <h1>📉 Price Tracker &amp; Deal Predictor</h1>
+    <p>Track product prices and get buy-now vs wait recommendations.</p>
+  </div>
+  <div class="card" style="margin-bottom:16px">
+    <div style="font-weight:700;margin-bottom:12px">Track a Product</div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end">
+      <div style="flex:1;min-width:200px">
+        <label class="filter-label">Select Product</label>
+        <select class="input" id="trk-product"></select>
+      </div>
+      <div>
+        <label class="filter-label">Target Price (₹)</label>
+        <input class="input" type="number" id="trk-target" placeholder="e.g. 20000" style="width:160px"/>
+      </div>
+      <button class="btn btn-p" onclick="addTracker()">+ Start Tracking</button>
+    </div>
+  </div>
+  <div id="trk-list"></div>
+</div>
+
+<!-- REVIEWS -->
+<div id="pg-reviews" class="page">
+  <div class="page-header">
+    <h1>⭐ Review Intelligence</h1>
+    <p>Sentiment analysis, theme extraction, and review quality indicators.</p>
+  </div>
+  <div class="card" style="margin-bottom:16px">
+    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+      <select class="input" id="rev-select" onchange="loadReviews()" style="max-width:360px">
+        <option value="">Select a product to analyze...</option>
+      </select>
+      <span class="badge badge-amber">Sample Reviews — Demo Data</span>
+    </div>
+  </div>
+  <div id="rev-content">
+    <div class="empty-state card">
+      <div class="es-icon">🔍</div>
+      <div class="es-msg">Select a product above</div>
+      <div class="es-sub">Review analysis will appear here</div>
+    </div>
+  </div>
+</div>
+
+<!-- PULSE -->
+<div id="pg-pulse" class="page">
+  <div class="page-header">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start">
+      <div><h1>📊 Smart Shopping Pulse</h1><p>Analytics dashboard — demo catalog insights.</p></div>
+      <span class="badge badge-amber">Demo Data</span>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:20px" id="pulse-stats"></div>
+  <div class="g2" style="margin-bottom:16px">
+    <div class="card"><div class="section-title" style="margin-bottom:14px">Products by Category</div><div id="pulse-cat"></div></div>
+    <div class="card"><div class="section-title" style="margin-bottom:14px">Avg Price by Category</div><div id="pulse-price"></div></div>
+  </div>
+  <div class="card" style="margin-bottom:16px"><div class="section-title" style="margin-bottom:14px">🏆 Top 8 Products — Value Score Ranking</div><div id="pulse-val"></div></div>
+  <div class="card"><div class="section-title" style="margin-bottom:14px">🌿 Sustainability Score Distribution</div><div id="pulse-sust"></div></div>
+</div>
+
+<!-- SHOPPING LIST -->
+<div id="pg-list" class="page">
+  <div class="page-header">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px">
+      <div><h1>📋 My Shopping List</h1><p>Add products, track budget, mark purchases.</p></div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <label style="font-size:13px;font-weight:600;color:#64748b">My Budget:</label>
+        <div style="display:flex;align-items:center;gap:4px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:9px;padding:6px 10px">
+          <span style="font-size:13px;color:#64748b;font-weight:600">₹</span>
+          <input type="number" id="budget-input" value="100000" onchange="renderList()" style="width:110px;border:none;background:transparent;outline:none;font-size:13px;font-weight:700;color:#1e293b"/>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="g3" style="margin-bottom:18px" id="list-stats"></div>
+  <div class="card" style="margin-bottom:16px">
+    <div style="font-weight:700;margin-bottom:10px">+ Add Product</div>
+    <div style="position:relative;max-width:440px">
+      <input class="input" id="list-search" placeholder="Search product to add..." oninput="listAutocomplete()"/>
+      <div id="list-dropdown" style="position:absolute;top:100%;left:0;right:0;background:#fff;border:1px solid #e2e8f0;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.1);z-index:50;margin-top:4px;display:none;max-height:220px;overflow-y:auto"></div>
+    </div>
+  </div>
+  <div id="list-items"></div>
+</div>
+
+<!-- SETTINGS -->
+<div id="pg-settings" class="page">
+  <div class="page-header"><h1>⚙️ Settings &amp; Preferences</h1></div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;max-width:820px">
+    <div class="card">
+      <div class="section-title" style="margin-bottom:14px">💰 Budget &amp; Spending</div>
+      <label class="filter-label">Monthly Shopping Budget (₹)</label>
+      <input class="input" type="number" id="s-budget" value="100000" style="margin-bottom:12px"/>
+      <label class="filter-label">Currency Display</label>
+      <select class="input"><option>INR (₹) — Indian Rupee</option></select>
+    </div>
+    <div class="card">
+      <div class="section-title" style="margin-bottom:14px">🎛️ Recommendation Weights</div>
+      <label class="filter-label">Quality vs Price: <strong id="qp-label">Balanced</strong></label>
+      <input type="range" min="0" max="100" value="50" oninput="document.getElementById('qp-label').textContent=this.value<35?'Price Focus':this.value>65?'Quality Focus':'Balanced'" style="margin-bottom:14px"/>
+      <label class="filter-label">Sustainability Importance: <strong id="sust-label">Medium</strong></label>
+      <input type="range" min="0" max="100" value="40" oninput="document.getElementById('sust-label').textContent=this.value<35?'Low':this.value>65?'High':'Medium'"/>
+    </div>
+    <div class="card">
+      <div class="section-title" style="margin-bottom:12px">📂 Preferred Categories</div>
+      <label style="display:flex;align-items:center;gap:9px;font-size:13px;margin-bottom:9px"><input type="checkbox" checked/> 📱 Smartphones</label>
+      <label style="display:flex;align-items:center;gap:9px;font-size:13px;margin-bottom:9px"><input type="checkbox" checked/> 💻 Laptops</label>
+      <label style="display:flex;align-items:center;gap:9px;font-size:13px;margin-bottom:9px"><input type="checkbox"/> 🎧 Headphones</label>
+      <label style="display:flex;align-items:center;gap:9px;font-size:13px;margin-bottom:9px"><input type="checkbox"/> ⌚ Smartwatches</label>
+      <label style="display:flex;align-items:center;gap:9px;font-size:13px"><input type="checkbox"/> 🏠 Home Appliances</label>
+    </div>
+    <div class="card">
+      <div class="section-title" style="margin-bottom:12px">🔔 Notifications</div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-size:13px">Price Drop Alerts</span><input type="checkbox" checked style="width:17px;height:17px"/></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-size:13px">Deal Notifications</span><input type="checkbox" checked style="width:17px;height:17px"/></div>
+      <div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:13px">Weekly Summary</span><input type="checkbox" style="width:17px;height:17px"/></div>
+    </div>
+    <div class="card" style="grid-column:1/-1">
+      <div class="section-title" style="margin-bottom:14px">🤖 AI Integration Status</div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px">
+        <div style="flex:1;display:flex;gap:10px;align-items:center;background:#fef3c7;padding:12px 16px;border-radius:10px;min-width:180px">
+          <span style="font-size:22px">⚡</span>
+          <div><div style="font-size:13px;font-weight:700;color:#92400e">Demo Mode Active</div><div style="font-size:11.5px;color:#b45309;margin-top:2px">Set IBM_WATSONX_API_KEY in .env to enable live AI</div></div>
+        </div>
+        <div style="flex:1;display:flex;gap:10px;align-items:center;background:#f1f5f9;padding:12px 16px;border-radius:10px;min-width:180px">
+          <span style="font-size:22px">🔗</span>
+          <div><div style="font-size:13px;font-weight:700">IBM Langflow</div><div style="font-size:11.5px;color:#64748b;margin-top:2px">Set IBM_LANGFLOW_URL in .env</div></div>
+        </div>
+        <div style="flex:1;display:flex;gap:10px;align-items:center;background:#f0fdf4;padding:12px 16px;border-radius:10px;min-width:180px">
+          <span style="font-size:22px">✅</span>
+          <div><div style="font-size:13px;font-weight:700;color:#15803d">Local Engine</div><div style="font-size:11.5px;color:#16a34a;margin-top:2px">Running — all features active</div></div>
+        </div>
+      </div>
+      <button class="btn btn-p" onclick="saveSettings()">💾 Save Preferences</button>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<!-- PRODUCT MODAL -->
+<div class="modal-bg" id="product-modal" onclick="closeModal(event)">
+  <div class="modal-inner" onclick="event.stopPropagation()">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px">
+      <div id="modal-title" style="font-size:18px;font-weight:800;color:#1e293b;max-width:88%;line-height:1.3"></div>
+      <button onclick="document.getElementById('product-modal').classList.remove('open')" style="border:none;background:#f1f5f9;border-radius:8px;padding:6px 11px;cursor:pointer;font-size:16px;color:#64748b;flex-shrink:0">✕</button>
+    </div>
+    <div id="modal-body"></div>
+  </div>
+</div>
+
+<div id="toast-container"></div>
+
+<script>
+'use strict';
+
+const PRODUCTS = [
+  {id:'p01',n:'Samsung Galaxy S23 FE',b:'Samsung',c:'smartphones',p:34999,o:44999,d:22,r:4.3,rv:3421,img:'https://placehold.co/120x120/dbeafe/1e40af?text=S23+FE',sp:{Display:'6.4" AMOLED 120Hz',CPU:'Exynos 2200',RAM:'8 GB',Storage:'128 GB',Camera:'50+12+8 MP',Battery:'4500 mAh 25W','5G':'Yes'},tags:['5G','AMOLED','120Hz','Fast Charge','IP68'],pros:['Brilliant AMOLED display','IP68 water resistant','Consistent software updates'],cons:['No charger in box','Plastic back panel','Average battery life'],sust:62,val:78,ph:[44999,42999,39999,37999,36499,34999],revs:[{a:'Rahul M.',r:5,t:'Excellent phone! Display and camera are superb.',v:true},{a:'Priya S.',r:4,t:'Good performance overall. Battery could be better.',v:true},{a:'Amit K.',r:4,t:'Samsung software is polished and updates are reliable.',v:false}]},
+  {id:'p02',n:'Redmi Note 13 Pro',b:'Redmi',c:'smartphones',p:24999,o:29999,d:17,r:4.4,rv:5123,img:'https://placehold.co/120x120/dcfce7/166534?text=Note+13',sp:{Display:'6.67" AMOLED 120Hz',CPU:'Snapdragon 7s Gen 2',RAM:'8 GB',Storage:'256 GB',Camera:'200 MP',Battery:'5100 mAh 67W','5G':'Yes'},tags:['5G','200MP Camera','67W Charge','AMOLED'],pros:['Incredible 200MP camera','67W fast charging','Excellent display'],cons:['No headphone jack','Heats up under load'],sust:55,val:82,ph:[29999,28499,27999,26999,25999,24999],revs:[{a:'Aarav K.',r:5,t:'Best phone under 25k. The camera quality is insane.',v:true},{a:'Sneha R.',r:4,t:'Fast charging is a game changer.',v:true}]},
+  {id:'p03',n:'OnePlus Nord CE 3',b:'OnePlus',c:'smartphones',p:26999,o:33999,d:21,r:4.2,rv:2841,img:'https://placehold.co/120x120/fae8ff/6b21a8?text=Nord+CE3',sp:{Display:'6.7" AMOLED 120Hz',CPU:'Snapdragon 782G',RAM:'8 GB',Storage:'128 GB',Camera:'50+8+2 MP',Battery:'5000 mAh 80W','5G':'Yes'},tags:['5G','80W Charge','AMOLED','OxygenOS'],pros:['Blazing 80W fast charge','Clean OxygenOS','Bright AMOLED'],cons:['Average low-light camera','Plastic build'],sust:50,val:74,ph:[33999,31999,30999,29499,28499,26999],revs:[{a:'Vikram T.',r:4,t:'OnePlus quality at a great price. Charging speed is unreal.',v:true}]},
+  {id:'p04',n:'iQOO Z9',b:'iQOO',c:'smartphones',p:19999,o:23999,d:17,r:4.3,rv:1987,img:'https://placehold.co/120x120/fff7ed/9a3412?text=iQOO+Z9',sp:{Display:'6.67" AMOLED 144Hz',CPU:'Snapdragon 7 Gen 3',RAM:'8 GB',Storage:'128 GB',Camera:'50+2 MP',Battery:'5000 mAh 44W','5G':'Yes'},tags:['5G','144Hz','Gaming','AMOLED'],pros:['Smooth 144Hz gaming display','Powerful Snapdragon chip','Strong battery life'],cons:['Only 2 cameras','Average ultrawide'],sust:48,val:85,ph:[23999,22999,21999,21499,20499,19999],revs:[{a:'Arjun M.',r:5,t:'Gaming beast under 20k. 144Hz display is buttery smooth!',v:true}]},
+  {id:'p05',n:'Realme Narzo 60',b:'Realme',c:'smartphones',p:15999,o:18999,d:16,r:4.0,rv:1543,img:'https://placehold.co/120x120/fef2f2/991b1b?text=Narzo+60',sp:{Display:'6.43" AMOLED 90Hz',CPU:'Dimensity 6020',RAM:'6 GB',Storage:'128 GB',Camera:'64+2 MP',Battery:'5000 mAh 33W','5G':'Yes'},tags:['5G','Budget','AMOLED','90Hz'],pros:['Best budget 5G option','Good battery','Decent AMOLED screen'],cons:['Mediocre camera','Basic performance'],sust:42,val:71,ph:[18999,17999,17499,16999,16499,15999],revs:[{a:'Prerna D.',r:4,t:'Best budget 5G phone available right now.',v:false}]},
+  {id:'p06',n:'Motorola Edge 40',b:'Motorola',c:'smartphones',p:22999,o:28999,d:21,r:4.1,rv:2134,img:'https://placehold.co/120x120/f0fdf4/166534?text=Edge+40',sp:{Display:'6.55" pOLED 144Hz',CPU:'Dimensity 8020',RAM:'8 GB',Storage:'256 GB',Camera:'50+13 MP',Battery:'4400 mAh 68W','5G':'Yes'},tags:['5G','pOLED','68W Charge','Water Resistant'],pros:['Beautiful curved display','68W fast charging','Clean Android'],cons:['Smaller battery','Limited availability'],sust:53,val:76,ph:[28999,27499,26499,25499,24499,22999],revs:[{a:'Rohit B.',r:4,t:'Stunning display. Motorola is genuinely back!',v:true}]},
+  {id:'p07',n:'Lenovo IdeaPad Slim 3',b:'Lenovo',c:'laptops',p:45999,o:55999,d:18,r:4.2,rv:3201,img:'https://placehold.co/120x120/eff6ff/1d4ed8?text=IdeaPad',sp:{Display:'15.6" FHD IPS',CPU:'Ryzen 5 7520U',RAM:'16 GB DDR5',Storage:'512 GB SSD',GPU:'AMD Radeon',Battery:'14 hrs',Weight:'1.62 kg'},tags:['Ryzen 5','DDR5','SSD','FHD','Office'],pros:['Excellent value','14-hour battery','Lightweight'],cons:['Average brightness','Plastic chassis'],sust:61,val:80,ph:[55999,53999,51999,49999,47999,45999],revs:[{a:'Suresh P.',r:4,t:'Great student laptop. Battery lasts all day.',v:true}]},
+  {id:'p08',n:'Acer Aspire 7',b:'Acer',c:'laptops',p:56999,o:69999,d:19,r:4.4,rv:4102,img:'https://placehold.co/120x120/fff1f2/9f1239?text=Aspire+7',sp:{Display:'15.6" FHD IPS 144Hz',CPU:'Ryzen 5 7535HS',RAM:'16 GB',Storage:'512 GB SSD',GPU:'RTX 2050 4 GB',Battery:'8 hrs',Weight:'2.1 kg'},tags:['RTX 2050','144Hz','Gaming','Ryzen','SSD'],pros:['Dedicated GPU for gaming','Smooth 144Hz display','Powerful Ryzen CPU'],cons:['Heavier body','Fan loud under load'],sust:52,val:83,ph:[69999,67999,64999,61999,58999,56999],revs:[{a:'Karthik V.',r:5,t:'Best gaming laptop under ₹60K. RTX 2050 is great.',v:true}]},
+  {id:'p09',n:'ASUS VivoBook 15',b:'ASUS',c:'laptops',p:41999,o:50999,d:18,r:4.1,rv:3456,img:'https://placehold.co/120x120/ecfdf5/065f46?text=VivoBook',sp:{Display:'15.6" FHD IPS',CPU:'Ryzen 5 7520U',RAM:'8 GB',Storage:'512 GB SSD',GPU:'AMD Radeon',Battery:'12 hrs',Weight:'1.5 kg'},tags:['Ryzen 5','SSD','Lightweight','Thin'],pros:['Very lightweight at 1.5 kg','Good battery','Budget-friendly'],cons:['Only 8 GB RAM','Average keyboard'],sust:64,val:75,ph:[50999,48999,46999,45499,43999,41999],revs:[{a:'Anita S.',r:4,t:'Super lightweight! Perfect for daily commuting.',v:true}]},
+  {id:'p10',n:'HP Pavilion 15',b:'HP',c:'laptops',p:52999,o:63999,d:17,r:4.3,rv:2876,img:'https://placehold.co/120x120/fdf4ff/6b21a8?text=HP+Pav',sp:{Display:'15.6" FHD IPS',CPU:'Core i5-1335U',RAM:'16 GB DDR4',Storage:'512 GB SSD',GPU:'Intel Iris Xe',Battery:'10 hrs',Weight:'1.75 kg'},tags:['Intel i5','SSD','FHD','Backlit Keyboard'],pros:['Solid HP build quality','Good display and keyboard','Reliable long-term'],cons:['No discrete GPU','Slightly heavier'],sust:58,val:77,ph:[63999,61999,59999,57999,55999,52999],revs:[{a:'Deepak R.',r:4,t:'HP build quality never disappoints. Good all-rounder.',v:true}]},
+  {id:'p11',n:'Dell Inspiron 15',b:'Dell',c:'laptops',p:58999,o:72999,d:19,r:4.3,rv:2910,img:'https://placehold.co/120x120/f8fafc/1e293b?text=Dell+15',sp:{Display:'15.6" FHD',CPU:'Core i5-1335U',RAM:'16 GB',Storage:'512 GB SSD',GPU:'Intel Iris Xe',Battery:'9 hrs',Weight:'1.85 kg'},tags:['Intel i5','SSD','Dell','Reliable'],pros:['Dell reliability and support','Good display quality','Solid construction'],cons:['Average battery life','Slightly heavy'],sust:57,val:76,ph:[72999,69999,66999,63999,61999,58999],revs:[{a:'Manish V.',r:4,t:'Dell quality never disappoints. Very solid machine.',v:true}]},
+  {id:'p12',n:'Sony WH-1000XM4',b:'Sony',c:'headphones',p:19990,o:29990,d:33,r:4.8,rv:8921,img:'https://placehold.co/120x120/fef3c7/92400e?text=XM4',sp:{Type:'Over-ear',ANC:'Industry-leading',Battery:'30 hrs',Codec:'LDAC / aptX',Bluetooth:'5.0',Foldable:'Yes',Multipoint:'Yes'},tags:['ANC','LDAC','30hr Battery','Foldable','Premium'],pros:['Absolute best-in-class ANC','Stunning sound quality','30-hour battery life'],cons:['Touch controls can be finicky','Ear cups get warm'],sust:70,val:95,ph:[29990,26990,24990,22990,21490,19990],revs:[{a:'Meera J.',r:5,t:'Best headphones ever. The ANC is literally magical.',v:true},{a:'Sandeep K.',r:5,t:'Worth every single rupee. Changed how I experience music.',v:true}]},
+  {id:'p13',n:'boAt Rockerz 550',b:'boAt',c:'headphones',p:1499,o:3990,d:62,r:4.0,rv:45231,img:'https://placehold.co/120x120/fdf2f8/be185d?text=Rockerz',sp:{Type:'Over-ear',ANC:'No',Battery:'20 hrs',Codec:'SBC',Bluetooth:'5.0',Foldable:'Yes'},tags:['Budget','Bass Boost','Foldable','Value'],pros:['Outstanding value for money','Punchy powerful bass','Very comfortable fit'],cons:['No ANC','Plastic build','Average call quality'],sust:32,val:88,ph:[3990,2990,2490,1990,1699,1499],revs:[{a:'Sanjay M.',r:4,t:'Budget king! The bass is amazing for this price.',v:true}]},
+  {id:'p14',n:'JBL Tune 770NC',b:'JBL',c:'headphones',p:7999,o:12999,d:38,r:4.2,rv:3871,img:'https://placehold.co/120x120/eff6ff/1d4ed8?text=JBL+770',sp:{Type:'Over-ear',ANC:'Adaptive',Battery:'44 hrs',Codec:'SBC/AAC',Bluetooth:'5.3',Foldable:'Yes',Multipoint:'Yes'},tags:['ANC','44hr Battery','JBL Bass','Multipoint'],pros:['Incredible 44-hour battery','Decent adaptive ANC','JBL signature sound'],cons:['Slightly plasticky feel','ANC not at Sony level'],sust:56,val:86,ph:[12999,11499,10499,9499,8499,7999],revs:[{a:'Rahul G.',r:4,t:'44 hours of battery is unbelievable! Great value.',v:true}]},
+  {id:'p15',n:'Sennheiser HD 450BT',b:'Sennheiser',c:'headphones',p:9990,o:14990,d:33,r:4.3,rv:2341,img:'https://placehold.co/120x120/fef9c3/713f12?text=HD450',sp:{Type:'Over-ear',ANC:'Hybrid',Battery:'30 hrs',Codec:'aptX',Bluetooth:'5.0'},tags:['ANC','30hr Battery','aptX','Balanced Sound'],pros:['Beautifully balanced sound','30-hour battery','aptX support'],cons:['ANC slightly below Sony','Bulky form factor'],sust:60,val:82,ph:[14990,13490,12490,11490,10990,9990],revs:[{a:'Nikhil R.',r:4,t:'Sennheiser balanced tuning is perfect for music listeners.',v:true}]},
+  {id:'p16',n:'boAt Airdopes 141',b:'boAt',c:'headphones',p:1299,o:3490,d:63,r:3.9,rv:89231,img:'https://placehold.co/120x120/f0fdf4/166534?text=Airdopes',sp:{Type:'In-ear TWS',Battery:'42 hrs total',Bluetooth:'5.1',IPX4:'Yes'},tags:['Budget TWS','42hr Battery','IPX4','Value'],pros:['42-hour total battery life','Ultra affordable','IPX4 sweat resistant'],cons:['No ANC','SBC codec only','Average call quality'],sust:28,val:80,ph:[3490,2490,1990,1690,1499,1299],revs:[{a:'Mansi T.',r:4,t:'Sound quality is way better than expected at this price.',v:false}]},
+  {id:'p17',n:'Apple Watch SE (2nd Gen)',b:'Apple',c:'smartwatches',p:29900,o:35900,d:17,r:4.5,rv:6234,img:'https://placehold.co/120x120/f0fdf4/166534?text=Watch+SE',sp:{Display:'LTPO OLED Retina',Chip:'S8',Health:'Heart Rate, SpO2, Crash',GPS:'Yes',Water:'50m',Battery:'18 hrs'},tags:['Apple','GPS','Health','Crash Detection','WatchOS'],pros:['Best value Apple Watch','Full watchOS ecosystem','Crash detection'],cons:['iPhone only','No always-on display','18-hr battery'],sust:66,val:80,ph:[35900,34900,33900,32900,31900,29900],revs:[{a:'Ishaan V.',r:5,t:'Perfect companion to my iPhone. Health tracking is excellent.',v:true}]},
+  {id:'p18',n:'Samsung Galaxy Watch 6',b:'Samsung',c:'smartwatches',p:27999,o:34999,d:20,r:4.4,rv:4231,img:'https://placehold.co/120x120/dbeafe/1e40af?text=Watch+6',sp:{Display:'1.5" Super AMOLED',Chip:'Exynos W930',Health:'ECG, Body Composition',GPS:'Built-in',Water:'5ATM',Battery:'40 hrs'},tags:['AMOLED','ECG','BIA','GPS','Premium'],pros:['ECG and body composition','Bright AMOLED display','40-hour battery'],cons:['Best with Samsung phones','Expensive accessories'],sust:62,val:82,ph:[34999,32999,31499,30499,29499,27999],revs:[{a:'Abhishek M.',r:4,t:'ECG feature is genuinely useful. Great fitness companion.',v:true}]},
+  {id:'p19',n:'Amazfit GTR 4',b:'Amazfit',c:'smartwatches',p:12999,o:17999,d:28,r:4.3,rv:3102,img:'https://placehold.co/120x120/ecfdf5/065f46?text=GTR+4',sp:{Display:'1.43" AMOLED',Health:'Heart Rate, SpO2, Stress, Temp',GPS:'L1+L5 Dual Band',Water:'5ATM',Battery:'14 days'},tags:['14 Day Battery','Dual GPS','AMOLED','150+ Sports'],pros:['14-day battery life','Dual-band GPS accuracy','AMOLED display'],cons:['Zepp OS limited','Few third-party apps'],sust:55,val:85,ph:[17999,16499,15499,14499,13499,12999],revs:[{a:'Pooja N.',r:5,t:'14-day battery is truly incredible. GPS tracking is spot on.',v:true}]},
+  {id:'p20',n:'Noise ColorFit Pro 4',b:'Noise',c:'smartwatches',p:3499,o:6999,d:50,r:4.0,rv:12453,img:'https://placehold.co/120x120/fff7ed/9a3412?text=ColorFit',sp:{Display:'1.72" TFT LCD',Health:'Heart Rate, SpO2',GPS:'Connected GPS',Water:'IP68',Battery:'7 days'},tags:['Budget','IP68','7 Day Battery','BT Calling'],pros:['Bluetooth calling support','7-day battery','Budget-friendly price'],cons:['No built-in GPS','LCD display quality','Basic sensors'],sust:38,val:80,ph:[6999,5999,4999,4499,3999,3499],revs:[{a:'Tanvi P.',r:4,t:'Best budget smartwatch. Bluetooth calling is actually useful.',v:false}]},
+  {id:'p21',n:'boAt Storm Call 2',b:'boAt',c:'smartwatches',p:1999,o:4999,d:60,r:3.9,rv:23102,img:'https://placehold.co/120x120/fdf2f8/be185d?text=Storm+2',sp:{Display:'1.83" TFT',Health:'Heart Rate, SpO2',GPS:'Connected GPS',Water:'IP68',Battery:'5 days'},tags:['Budget','BT Calling','IP68','Value'],pros:['Ultra affordable entry price','Bluetooth calling','Large display'],cons:['Basic health tracking','Plastic finish','5-day battery'],sust:30,val:72,ph:[4999,3999,2999,2499,2199,1999],revs:[{a:'Anand R.',r:4,t:'For this price, it does everything I need.',v:false}]},
+  {id:'p22',n:'LG 8 kg Front Load Washer',b:'LG',c:'home_appliances',p:35990,o:45990,d:22,r:4.5,rv:5102,img:'https://placehold.co/120x120/eff6ff/1d4ed8?text=LG+Wash',sp:{Capacity:'8 kg',Type:'Front Load',RPM:'1400',Programs:'15',Energy:'5 Star',Inverter:'Direct Drive'},tags:['5 Star','Inverter','Front Load','Energy Efficient'],pros:['Excellent 5-star energy rating','Quiet Direct Drive motor','Smart diagnosis'],cons:['Longer wash cycle','Higher water use'],sust:78,val:87,ph:[45990,43990,41990,39990,37990,35990],revs:[{a:'Usha M.',r:5,t:'Best washing machine! Electricity bill dropped significantly.',v:true}]},
+  {id:'p23',n:'Philips Air Fryer HD9200',b:'Philips',c:'home_appliances',p:7995,o:11995,d:33,r:4.4,rv:8923,img:'https://placehold.co/120x120/fff7ed/9a3412?text=Air+Fryer',sp:{Capacity:'4.1 L',Power:'1400 W',Technology:'Rapid Air',Temp:'80-200°C',Timer:'60 min'},tags:['Air Fryer','Healthy Cooking','Easy Clean','Family Size'],pros:['Healthier oil-free cooking','Dishwasher safe parts','4.1L capacity'],cons:['No digital display','Limited preset programs'],sust:72,val:88,ph:[11995,10995,9995,8995,8495,7995],revs:[{a:'Rekha S.',r:5,t:'Completely changed our cooking habits. Crispy with less oil.',v:true}]},
+  {id:'p24',n:'Dyson V12 Detect Slim',b:'Dyson',c:'home_appliances',p:44900,o:54900,d:18,r:4.6,rv:2103,img:'https://placehold.co/120x120/fdf4ff/6b21a8?text=Dyson+V12',sp:{Type:'Cordless Stick',Suction:'150 AW',Runtime:'60 min',Filter:'HEPA',Weight:'2.2 kg',Detection:'Laser Dust'},tags:['Cordless','HEPA Filter','Laser Detect','Premium','Dyson'],pros:['Laser detects invisible dust','Best-in-class suction','HEPA filtration'],cons:['Very premium price point','60-min runtime'],sust:65,val:78,ph:[54900,52900,50900,48900,46900,44900],revs:[{a:'Nita K.',r:5,t:'Laser dust detection is revolutionary. Best vacuum ever.',v:true}]},
+  {id:'p25',n:'Havells Cista 1.5T AC',b:'Havells',c:'home_appliances',p:38990,o:49990,d:22,r:4.2,rv:1823,img:'https://placehold.co/120x120/ecfdf5/065f46?text=Havells+AC',sp:{Capacity:'1.5 Ton',Rating:'5 Star',Inverter:'Yes',Refrigerant:'R-32',Filter:'PM2.5',AutoClean:'Yes'},tags:['5 Star','Inverter','R-32','PM2.5 Filter','Auto Clean'],pros:['5-star energy efficiency','PM2.5 air purification','Auto-clean function'],cons:['No WiFi smart control','Fewer service centres'],sust:68,val:80,ph:[49990,47990,45990,43990,41990,38990],revs:[{a:'Bala S.',r:4,t:'Incredibly efficient AC. Electricity bill is surprisingly low.',v:true}]}
+];
+
+const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun'];
+let cmpList = [], trackedList = [], shoppingList = [];
+try { trackedList = JSON.parse(localStorage.getItem('sc_tracked') || '[]'); } catch(e) {}
+try { shoppingList = JSON.parse(localStorage.getItem('sc_list') || '[]'); } catch(e) {}
+
+const save = () => {
+  localStorage.setItem('sc_tracked', JSON.stringify(trackedList));
+  localStorage.setItem('sc_list', JSON.stringify(shoppingList));
+};
+const fmt = n => '₹' + n.toLocaleString('en-IN');
+const stars = r => '★'.repeat(Math.round(r)) + '☆'.repeat(5 - Math.round(r));
+const pct = (n, tot) => tot ? Math.round(n / tot * 100) : 0;
+
+function toast(msg, type = 'info') {
+  const c = document.getElementById('toast-container');
+  const d = document.createElement('div');
+  d.className = `toast toast-${type}`;
+  const icon = type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️';
+  d.innerHTML = `<span>${icon}</span><span>${msg}</span>`;
+  c.appendChild(d);
+  setTimeout(() => d.style.opacity = '0', 2600);
+  setTimeout(() => d.remove(), 3000);
+}
+
+function nav(pageId, el) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('pg-' + pageId).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  if (el) el.classList.add('active');
+  else {
+    document.querySelectorAll('.nav-item').forEach(n => {
+      if (n.textContent.toLowerCase().includes(pageId.substring(0, 4))) n.classList.add('active');
+    });
+  }
+  closeSidebar();
+  if (pageId === 'pulse') renderPulse();
+  if (pageId === 'tracker') renderTracker();
+  if (pageId === 'list') renderList();
+  if (pageId === 'reviews') populateRevSelect();
+  updateBadges();
+}
+
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('overlay').classList.toggle('open');
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('overlay').classList.remove('open');
+}
+
+function init() {
+  const now = new Date();
+  const h = now.getHours();
+  const greeting = h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening';
+  document.getElementById('greet-msg').textContent = greeting + ', Shopper 👋';
+  document.getElementById('date-str').textContent = now.toLocaleDateString('en-IN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+  renderDashboardStats();
+  renderDashTrending();
+  renderDashRecs();
+  populateTrkSelect();
+  populateRevSelect();
+  updateBadges();
+  initChat();
+  setPrio('val');
+  allResults = [...PRODUCTS];
+  applyFilters();
+}
+
+function updateBadges() {
+  const cb = document.getElementById('cmp-badge');
+  const lb = document.getElementById('list-badge');
+  if (cmpList.length > 0) { cb.style.display = 'inline'; cb.textContent = cmpList.length; }
+  else { cb.style.display = 'none'; }
+  if (shoppingList.length > 0) { lb.style.display = 'inline'; lb.textContent = shoppingList.length; }
+  else { lb.style.display = 'none'; }
+}
+
+function renderDashboardStats() {
+  const totalSavings = PRODUCTS.reduce((s, p) => s + (p.o - p.p), 0);
+  document.getElementById('dash-stats').innerHTML = `
+    <div class="stat-card"><div style="font-size:11px;color:#64748b;margin-bottom:4px">Total Savings Available</div><div style="font-size:22px;font-weight:800;color:#10b981">${fmt(totalSavings)}</div><div style="font-size:11px;color:#94a3b8;margin-top:2px">Across all products</div></div>
+    <div class="stat-card"><div style="font-size:11px;color:#64748b;margin-bottom:4px">Tracked Products</div><div style="font-size:22px;font-weight:800;color:#3b82f6" id="tracked-count">${trackedList.length}</div><div style="font-size:11px;color:#94a3b8;margin-top:2px">Price alerts active</div></div>
+    <div class="stat-card"><div style="font-size:11px;color:#64748b;margin-bottom:4px">Shopping List</div><div style="font-size:22px;font-weight:800;color:#7c3aed" id="list-count">${shoppingList.length}</div><div style="font-size:11px;color:#94a3b8;margin-top:2px">Items queued</div></div>`;
+}
+
+function renderDashTrending() {
+  const trending = [...PRODUCTS].sort((a, b) => b.d - a.d).slice(0, 4);
+  document.getElementById('dash-trending').innerHTML = trending.map(p => productCard(p)).join('');
+}
+
+function renderDashRecs() {
+  const recs = [...PRODUCTS].sort((a, b) => b.val - a.val).slice(0, 4);
+  document.getElementById('dash-recs').innerHTML = recs.map(p => productCard(p, 'Top value pick for you')).join('');
+}
+
+function dashQ(q) { document.getElementById('dash-search').value = q; dashSearch(); }
+function dashSearch() {
+  const q = document.getElementById('dash-search').value.trim();
+  if (!q) return;
+  document.getElementById('search-input').value = q;
+  nav('search', document.querySelectorAll('.nav-item')[1]);
+  doSearch();
+}
+
+function productCard(pr, reason) {
+  const disc = pr.o > pr.p ? `<span class="pcard-disc">-${pr.d}%</span>` : '';
+  const origPrice = pr.o > pr.p ? `<span class="pcard-orig">${fmt(pr.o)}</span>` : '';
+  const reasonHtml = reason ? `<div style="font-size:11.5px;color:#2563eb;margin-top:8px;padding:6px 9px;background:#eff6ff;border-radius:7px;font-weight:500">💡 ${reason}</div>` : '';
+  return `<div class="pcard" onclick="openProduct('${pr.id}')">
+    <img class="pcard-img" src="${pr.img}" alt="${pr.n}" onerror="this.src='https://placehold.co/120x120/e2e8f0/94a3b8?text=Product'"/>
+    <div class="pcard-brand">${pr.b}</div>
+    <div class="pcard-name">${pr.n}</div>
+    <div class="pcard-rating">${stars(pr.r)} <span style="color:#64748b;font-size:11.5px">${pr.r} (${pr.rv.toLocaleString()})</span></div>
+    <div class="pcard-price">
+      <span class="pcard-now">${fmt(pr.p)}</span>
+      ${origPrice}${disc}
+    </div>
+    <div class="pcard-actions">
+      <button class="pcard-act" style="background:#eff6ff;color:#2563eb" onclick="event.stopPropagation();addCompare('${pr.id}')">⚖️ Cmp</button>
+      <button class="pcard-act" style="background:#f0fdf4;color:#15803d" onclick="event.stopPropagation();addToList('${pr.id}')">+ List</button>
+      <button class="pcard-act" style="background:#fef3c7;color:#b45309" onclick="event.stopPropagation();quickTrack('${pr.id}')">📉 Track</button>
+    </div>
+    ${reasonHtml}
+  </div>`;
+}
+
+function openProduct(id) {
+  const pr = PRODUCTS.find(p => p.id === id);
+  if (!pr) return;
+  document.getElementById('modal-title').textContent = pr.n;
+  const sv = pr.o - pr.p;
+  const phHtml = pr.ph.map((v, i) =>
+    `<div style="display:flex;align-items:center;gap:8px;margin-bottom:5px">
+      <span style="font-size:11.5px;color:#94a3b8;width:32px">${MONTHS[i]}</span>
+      <div class="pbar" style="flex:1"><div class="pfill" style="width:${Math.round(v/pr.o*100)}%;background:${v===pr.p?'#10b981':'#3b82f6'}"></div></div>
+      <span style="font-size:12px;font-weight:${v===pr.p?700:400};width:68px;text-align:right;color:${v===pr.p?'#10b981':'#475569'}">${fmt(v)}</span>
+    </div>`).join('');
+  const specsHtml = Object.entries(pr.sp).map(([k, v]) =>
+    `<tr><td style="font-size:12px;color:#64748b;padding:7px 10px;font-weight:600;white-space:nowrap;border-bottom:1px solid #f8fafc">${k}</td><td style="font-size:12.5px;padding:7px 10px;border-bottom:1px solid #f8fafc">${v}</td></tr>`).join('');
+  const revsHtml = pr.revs.map(rv =>
+    `<div style="padding:10px 0;border-bottom:1px solid #f8fafc">
+      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+        <strong style="font-size:13px">${rv.a}</strong>
+        <span style="font-size:12px;color:#f59e0b">${stars(rv.r)} ${rv.r}/5</span>
+      </div>
+      <p style="font-size:13px;color:#374151;margin:0 0 5px">${rv.t}</p>
+      <span class="badge ${rv.v ? 'badge-green' : 'badge-gray'}" style="font-size:10px">${rv.v ? '✓ Verified' : 'Unverified'}</span>
+      <span class="badge badge-amber" style="font-size:10px;margin-left:4px">Demo Review</span>
+    </div>`).join('');
+
+  document.getElementById('modal-body').innerHTML = `
+    <div style="display:grid;grid-template-columns:110px 1fr;gap:16px;margin-bottom:18px">
+      <img src="${pr.img}" style="width:110px;height:110px;object-fit:contain;border-radius:12px;border:1px solid #e2e8f0" onerror="this.src='https://placehold.co/110x110/e2e8f0/94a3b8?text=P'"/>
+      <div>
+        <div style="font-size:11px;color:#94a3b8;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px">${pr.b} · ${pr.c}</div>
+        <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:7px">
+          <span style="font-size:22px;font-weight:800">${fmt(pr.p)}</span>
+          ${pr.o>pr.p?`<span style="font-size:12px;color:#94a3b8;text-decoration:line-through">${fmt(pr.o)}</span><span class="badge badge-green">Save ${fmt(sv)}</span>`:''}
+        </div>
+        <div style="font-size:13px;color:#64748b;margin-bottom:9px">${stars(pr.r)} ${pr.r} · ${pr.rv.toLocaleString()} reviews</div>
+        <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:11px">
+          ${pr.tags.map(t => `<span class="badge badge-blue">${t}</span>`).join('')}
+        </div>
+        <div style="display:flex;gap:7px;flex-wrap:wrap">
+          <button class="btn btn-p btn-sm" onclick="addToList('${pr.id}');toast('Added to shopping list','success')">+ My List</button>
+          <button class="btn btn-s btn-sm" onclick="addCompare('${pr.id}')">⚖️ Compare</button>
+          <button class="btn btn-s btn-sm" onclick="quickTrack('${pr.id}')">📉 Track Price</button>
+        </div>
+      </div>
+    </div>
+    <div class="g2" style="margin-bottom:16px">
+      <div>
+        <div style="font-size:11.5px;font-weight:700;color:#15803d;margin-bottom:7px;text-transform:uppercase;letter-spacing:.5px">✓ Pros</div>
+        ${pr.pros.map(x => `<div style="font-size:13px;margin-bottom:4px;display:flex;gap:6px;align-items:flex-start"><span style="color:#10b981">●</span> ${x}</div>`).join('')}
+      </div>
+      <div>
+        <div style="font-size:11.5px;font-weight:700;color:#dc2626;margin-bottom:7px;text-transform:uppercase;letter-spacing:.5px">✗ Cons</div>
+        ${pr.cons.map(x => `<div style="font-size:13px;margin-bottom:4px;display:flex;gap:6px;align-items:flex-start"><span style="color:#ef4444">●</span> ${x}</div>`).join('')}
+      </div>
+    </div>
+    <div class="g2" style="margin-bottom:16px">
+      <div>
+        <div style="font-size:11.5px;font-weight:700;color:#64748b;margin-bottom:7px;text-transform:uppercase;letter-spacing:.5px">🌿 Sustainability Score</div>
+        <div class="score-wrap"><div class="pbar" style="flex:1"><div class="pfill" style="width:${pr.sust}%;background:${pr.sust>65?'#10b981':pr.sust>40?'#f59e0b':'#ef4444'}"></div></div><span class="score-num">${pr.sust}</span></div>
+        <div style="font-size:11px;color:#94a3b8;margin-top:4px">Demo estimate — not verified sustainability data</div>
+      </div>
+      <div>
+        <div style="font-size:11.5px;font-weight:700;color:#64748b;margin-bottom:7px;text-transform:uppercase;letter-spacing:.5px">💎 Value Score</div>
+        <div class="score-wrap"><div class="pbar" style="flex:1"><div class="pfill" style="width:${pr.val}%;background:#7c3aed"></div></div><span class="score-num">${pr.val}</span></div>
+      </div>
+    </div>
+    <div style="margin-bottom:16px">
+      <div style="font-size:11.5px;font-weight:700;color:#64748b;margin-bottom:9px;text-transform:uppercase;letter-spacing:.5px">📈 Price History <span style="font-weight:400;color:#94a3b8;text-transform:none">(Demo — Synthetic Data)</span></div>
+      ${phHtml}
+    </div>
+    <details style="margin-bottom:10px"><summary>📋 Full Specifications</summary>
+      <table style="width:100%;border-collapse:collapse;margin-top:8px">${specsHtml}</table>
+    </details>
+    <details><summary>💬 Sample Reviews <span style="font-weight:400;color:#94a3b8">(Demo — not real customer reviews)</span></summary>
+      <div style="margin-top:8px">${revsHtml}</div>
+    </details>`;
+  document.getElementById('product-modal').classList.add('open');
+}
+
+function closeModal(e) {
+  if (e.target === document.getElementById('product-modal'))
+    document.getElementById('product-modal').classList.remove('open');
+}
+
+let allResults = [...PRODUCTS];
+let activeFeatureChips = [];
+
+function doSearch() {
+  const q = document.getElementById('search-input').value.trim().toLowerCase();
+  if (!q) { allResults = [...PRODUCTS]; applyFilters(); return; }
+  const bm = q.match(/(?:under|below|within|less\s*than)[^\d]*(\d[\d,]*)/i);
+  const budget = bm ? parseFloat(bm[1].replace(/,/g, '')) : null;
+  const catMap = { phone:'smartphones',smartphone:'smartphones',mobile:'smartphones',laptop:'laptops',notebook:'laptops',headphone:'headphones',earphone:'headphones',tws:'headphones',earbuds:'headphones',watch:'smartwatches',smartwatch:'smartwatches',ac:'home_appliances',vacuum:'home_appliances',washing:'home_appliances',washer:'home_appliances',fryer:'home_appliances',appliance:'home_appliances' };
+  let cat = null;
+  for (const [k, v] of Object.entries(catMap)) { if (q.includes(k)) { cat = v; break; } }
+  const kws = q.split(/\s+/).filter(w => w.length > 2);
+  allResults = PRODUCTS.filter(p => {
+    if (cat && p.c !== cat) return false;
+    if (budget && p.p > budget) return false;
+    const hay = (p.n + ' ' + p.b + ' ' + p.tags.join(' ') + ' ' + Object.values(p.sp).join(' ')).toLowerCase();
+    return kws.some(kw => hay.includes(kw));
+  });
+  if (!allResults.length)
+    allResults = PRODUCTS.filter(p => (!cat || p.c === cat) && (!budget || p.p <= budget));
+  const meta = [];
+  if (cat) meta.push(`<span class="badge badge-blue">Category: ${cat}</span>`);
+  if (budget) meta.push(`<span class="badge badge-green">Budget: ${fmt(budget)}</span>`);
+  document.getElementById('search-meta').innerHTML =
+    `<strong>${allResults.length}</strong> results for "<em>${document.getElementById('search-input').value}</em>" ${meta.join(' ')} <span class="badge badge-amber">Demo Data</span>`;
+  applyFilters();
+}
+
+function applyFilters() {
+  let r = [...allResults];
+  const cat = document.getElementById('f-cat').value;
+  const max = parseFloat(document.getElementById('f-max').value) || 0;
+  const mr = parseFloat(document.getElementById('f-rating').value) || 0;
+  const srt = document.getElementById('f-sort').value;
+  if (cat) r = r.filter(p => p.c === cat);
+  if (max > 0) r = r.filter(p => p.p <= max);
+  if (mr > 0) r = r.filter(p => p.r >= mr);
+  if (activeFeatureChips.length) r = r.filter(p => activeFeatureChips.every(ft => p.tags.some(t => t.toLowerCase().includes(ft.toLowerCase()))));
+  if (srt === 'pa') r.sort((a, b) => a.p - b.p);
+  else if (srt === 'pd') r.sort((a, b) => b.p - a.p);
+  else if (srt === 'rating') r.sort((a, b) => b.r - a.r);
+  else if (srt === 'disc') r.sort((a, b) => b.d - a.d);
+  else r.sort((a, b) => b.val - a.val);
+  const meta = document.getElementById('search-meta');
+  if (!meta.textContent.trim())
+    meta.innerHTML = `<strong>${r.length}</strong> products <span class="badge badge-amber">Demo Data</span>`;
+  document.getElementById('search-results').innerHTML = r.length
+    ? r.map(p => productCard(p)).join('')
+    : `<div class="empty-state card" style="grid-column:1/-1"><div class="es-icon">🔍</div><div class="es-msg">No products match</div><div class="es-sub">Try clearing filters or different keywords</div></div>`;
+}
+
+function toggleChip(el, val) {
+  el.classList.toggle('on');
+  if (el.classList.contains('on')) activeFeatureChips.push(val);
+  else activeFeatureChips = activeFeatureChips.filter(v => v !== val);
+  applyFilters();
+}
+
+function clearFilters() {
+  document.getElementById('f-cat').value = '';
+  document.getElementById('f-max').value = '';
+  document.getElementById('f-rating').value = '';
+  document.getElementById('f-sort').value = 'val';
+  document.getElementById('search-input').value = '';
+  document.querySelectorAll('#feature-chips .chip').forEach(c => c.classList.remove('on'));
+  activeFeatureChips = [];
+  allResults = [...PRODUCTS];
+  document.getElementById('search-meta').innerHTML = '';
+  applyFilters();
+}
+
+function clearSearch() {
+  document.getElementById('search-input').value = '';
+  allResults = [...PRODUCTS];
+  document.getElementById('search-meta').innerHTML = '';
+  applyFilters();
+}
+
+function quickSearch(q) { document.getElementById('search-input').value = q; doSearch(); }
+
+function addCompare(id) {
+  if (cmpList.includes(id)) { toast('Already in comparison list', 'info'); return; }
+  if (cmpList.length >= 4) { toast('Max 4 products — remove one first', 'error'); return; }
+  cmpList.push(id);
+  renderCmpChips();
+  updateBadges();
+  toast(PRODUCTS.find(p => p.id === id).n + ' added to comparison', 'success');
+}
+function removeCmp(id) {
+  cmpList = cmpList.filter(x => x !== id);
+  renderCmpChips();
+  updateBadges();
+  document.getElementById('cmp-table-wrap').innerHTML = '';
+  document.getElementById('cmp-ai-summary').style.display = 'none';
+}
+function renderCmpChips() {
+  document.getElementById('cmp-chips').innerHTML = cmpList.map(id => {
+    const p = PRODUCTS.find(x => x.id === id);
+    return `<span style="display:inline-flex;align-items:center;gap:6px;background:#eff6ff;color:#2563eb;padding:5px 12px;border-radius:999px;font-size:12.5px;font-weight:600">
+      ${p.n} <span onclick="removeCmp('${id}')" style="cursor:pointer;color:#94a3b8;font-size:14px;line-height:1" title="Remove">×</span>
+    </span>`;
+  }).join('');
+}
+function cmpAutocomplete() {
+  const q = document.getElementById('cmp-input').value.toLowerCase();
+  const box = document.getElementById('cmp-dropdown');
+  if (!q) { box.style.display = 'none'; return; }
+  const hits = PRODUCTS.filter(p => (p.n + ' ' + p.b).toLowerCase().includes(q)).slice(0, 6);
+  if (!hits.length) { box.style.display = 'none'; return; }
+  box.innerHTML = hits.map(p =>
+    `<div style="padding:9px 13px;cursor:pointer;font-size:13px;border-bottom:1px solid #f8fafc;display:flex;justify-content:space-between"
+       onmouseenter="this.style.background='#f8fafc'" onmouseleave="this.style.background=''"
+       onclick="addCompare('${p.id}');document.getElementById('cmp-input').value='';document.getElementById('cmp-dropdown').style.display='none'">
+      <span>${p.n}</span><span style="color:#94a3b8">${fmt(p.p)}</span>
+    </div>`).join('');
+  box.style.display = 'block';
+}
+
+let activePrio = 'val';
+function setPrio(p) {
+  activePrio = p;
+  ['val','qual','price','sust'].forEach(k => {
+    const el = document.getElementById('prio-' + k);
+    el.style.background = '#f1f5f9'; el.style.color = '#475569'; el.style.fontWeight = '500';
+    el.classList.remove('btn-p');
+  });
+  const el = document.getElementById('prio-' + p);
+  el.style.background = 'linear-gradient(135deg,#3b82f6,#6366f1)'; el.style.color = '#fff'; el.style.fontWeight = '700';
+}
+
+function runCompare() {
+  if (cmpList.length < 2) { toast('Add at least 2 products to compare', 'error'); return; }
+  const prods = cmpList.map(id => PRODUCTS.find(p => p.id === id));
+  const score = p => {
+    if (activePrio === 'price') return -p.p;
+    if (activePrio === 'qual') return p.r * 20 + p.val * 0.3;
+    if (activePrio === 'sust') return p.sust;
+    return p.val * 0.5 + p.r * 10 + p.d * 0.4;
+  };
+  const scored = [...prods].sort((a, b) => score(b) - score(a));
+  const winner = scored[0];
+  const allSpecs = [...new Set(prods.flatMap(p => Object.keys(p.sp)))];
+  const rows = [
+    ['💰 Price', p => `<strong>${fmt(p.p)}</strong>`],
+    ['🏷️ Discount', p => p.d + '%'],
+    ['⭐ Rating', p => p.r + ' ★ (' + p.rv.toLocaleString() + ')'],
+    ['💎 Value Score', p => scoreBar(p.val, '#7c3aed')],
+    ['🌿 Sustainability', p => scoreBar(p.sust, p.sust>65?'#10b981':p.sust>40?'#f59e0b':'#ef4444')],
+    ['✓ Top Pro', p => `<span style="color:#15803d">${p.pros[0]}</span>`],
+    ['✗ Top Con', p => `<span style="color:#dc2626">${p.cons[0]}</span>`],
+  ];
+  document.getElementById('cmp-table-wrap').innerHTML = `
+    <div style="overflow-x:auto">
+      <table class="cmp-table">
+        <thead><tr>
+          <th>Feature</th>
+          ${prods.map(p => `<th class="${p.id===winner.id?'winner':''}">
+            ${p.n} ${p.id===winner.id?'<span class="badge badge-blue" style="font-size:10px">🏆 Winner</span>':''}
+          </th>`).join('')}
+        </tr></thead>
+        <tbody>
+          ${rows.map(([lbl, fn]) => `<tr><td style="font-size:12px;font-weight:600;color:#64748b;white-space:nowrap">${lbl}</td>${prods.map(p => `<td class="${p.id===winner.id?'winner':''}">${fn(p)}</td>`).join('')}</tr>`).join('')}
+          <tr><td colspan="${prods.length+1}" style="background:#f8fafc;font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.5px;padding:8px 13px">Specifications</td></tr>
+          ${allSpecs.map(k => `<tr><td style="font-size:11.5px;color:#64748b;font-weight:600">${k}</td>${prods.map(p => `<td class="${p.id===winner.id?'winner':''}" style="font-size:12.5px">${p.sp[k]||'—'}</td>`).join('')}</tr>`).join('')}
+        </tbody>
+      </table>
+    </div>`;
+  const runner = scored[1];
+  const prioLabel = {val:'Best Value',qual:'Best Quality',price:'Lowest Price',sust:'Best Sustainability'};
+  const sumEl = document.getElementById('cmp-ai-summary');
+  sumEl.style.display = 'block';
+  sumEl.style.borderLeft = '4px solid #3b82f6';
+  sumEl.style.marginTop = '14px';
+  sumEl.innerHTML = `
+    <div style="font-size:12px;font-weight:700;color:#2563eb;margin-bottom:8px">🤖 AI Comparison Summary <span class="badge badge-amber" style="font-size:10px">Demo Mode — Local Engine</span></div>
+    <div style="font-size:13.5px;line-height:1.7;color:#374151">
+      Based on your <strong>${prioLabel[activePrio]||activePrio}</strong> priority, <strong>${winner.n}</strong> is the recommended choice.
+      ${winner.pros[0].charAt(0).toUpperCase()+winner.pros[0].slice(1)} — priced at ${fmt(winner.p)}.
+      ${runner ? `The runner-up is <strong>${runner.n}</strong> (${fmt(runner.p)}) — consider it if ${runner.pros[0].toLowerCase()}.` : ''}
+    </div>
+    <div style="font-size:11.5px;color:#94a3b8;margin-top:8px">Local weighted scoring model. Set IBM_WATSONX_API_KEY to enable live AI.</div>`;
+}
+
+function scoreBar(val, color) {
+  return `<div class="score-wrap"><div class="pbar" style="flex:1;height:8px"><div class="pfill" style="width:${val}%;background:${color}"></div></div><span style="font-size:12px;font-weight:700;margin-left:7px">${val}</span></div>`;
+}
+
+const BOT_RULES = [
+  { keys: ['5g','phone','smartphone','25000','25k'],
+    fn: () => {
+      const m = PRODUCTS.filter(p => p.c==='smartphones' && p.p<=25000 && p.tags.includes('5G')).sort((a,b) => b.val-a.val).slice(0,3);
+      return m.length
+        ? `I found <strong>${m.length} great 5G smartphones</strong> under ₹25,000:<br><br>` +
+          m.map((p,i) => `<strong>${i+1}. ${p.n}</strong> — ${fmt(p.p)}<br>Rating: ${p.r}★ · ${p.pros[0]}`).join('<br><br>') +
+          `<br><br>🏆 <strong>Top Pick: ${m[0].n}</strong> — Value Score ${m[0].val}/100.` +
+          `<br><br><em style="color:#94a3b8;font-size:12px">Demo Mode — local recommendation engine</em>`
+        : 'No 5G smartphones under ₹25,000 found in demo catalog.';
+    }},
+  { keys: ['laptop','programming','developer','coding','60000','60k'],
+    fn: () => {
+      const m = PRODUCTS.filter(p => p.c==='laptops' && p.p<=60000).sort((a,b) => b.val-a.val).slice(0,3);
+      return `Best laptops for programming under ₹60,000:<br><br>` +
+        m.map((p,i) => `<strong>${i+1}. ${p.n}</strong> — ${fmt(p.p)}<br>${Object.entries(p.sp).slice(0,3).map(([k,v]) => k+': '+v).join(' · ')}`).join('<br><br>') +
+        `<br><br>🏆 Recommended: <strong>${m[0].n}</strong> — ${m[0].pros[0]}.` +
+        `<br><br><em style="color:#94a3b8;font-size:12px">Demo Mode</em>`;
+    }},
+  { keys: ['eco','green','sustainable','environment','planet'],
+    fn: () => {
+      const m = [...PRODUCTS].sort((a,b) => b.sust-a.sust).slice(0,4);
+      return `🌿 <strong>Top eco-friendly picks</strong> by sustainability score:<br><br>` +
+        m.map((p,i) => `<strong>${i+1}. ${p.n}</strong> — Score ${p.sust}/100<br>${fmt(p.p)}`).join('<br><br>') +
+        `<br><br><em style="color:#94a3b8;font-size:12px">Sustainability scores are demo estimates, not verified data.</em>`;
+    }},
+  { keys: ['wait','sale','buy now','should i buy','timing'],
+    fn: () => `📊 <strong>Buy now vs wait:</strong><br><br>
+      ● If discount is >20% — good time to buy now<br>
+      ● Major sale seasons: Big Billion Days (Oct), Great Indian Festival (Oct), Republic Day (Jan), Diwali (Oct-Nov)<br><br>
+      ⚠️ I cannot predict future prices. Heuristic guidance only.<br>
+      <em style="color:#94a3b8;font-size:12px">Demo Mode — no real-time market data</em>`
+  },
+  { keys: ['anc','noise cancell','headphone','earphone'],
+    fn: () => {
+      const m = PRODUCTS.filter(p => p.c==='headphones' && p.tags.some(t => t.toLowerCase().includes('anc'))).sort((a,b) => b.r-a.r);
+      return `🎧 Best ANC headphones in catalog:<br><br>` +
+        m.map((p,i) => `<strong>${i+1}. ${p.n}</strong> — ${fmt(p.p)}<br>Rating: ${p.r}★ · ${p.pros[0]}`).join('<br><br>') +
+        `<br><br>🏆 Best: <strong>${m[0]?.n||'Sony WH-1000XM4'}</strong><br><em style="color:#94a3b8;font-size:12px">Demo Mode</em>`;
+    }},
+  { keys: ['compare','vs','versus','difference'],
+    fn: () => `To compare: go to Compare tab, add 2–4 products, choose your priority, click Compare Now!`
+  },
+  { keys: ['smartwatch','watch','fitness','health tracking','15000','15k'],
+    fn: () => {
+      const m = [...PRODUCTS].filter(p => p.c==='smartwatches' && p.p<=15000).sort((a,b) => b.val-a.val).slice(0,3);
+      return `⌚ Top smartwatches under ₹15,000:<br><br>` +
+        m.map((p,i) => `<strong>${i+1}. ${p.n}</strong> — ${fmt(p.p)}<br>${p.pros[0]}`).join('<br><br>') +
+        `<br><em style="color:#94a3b8;font-size:12px">Demo Mode</em>`;
+    }},
+  { keys: ['cheap','budget','affordable','cheapest','lowest'],
+    fn: () => {
+      const m = [...PRODUCTS].sort((a,b) => a.p-b.p).slice(0,4);
+      return `🏷️ Most affordable products:<br><br>` +
+        m.map((p,i) => `<strong>${i+1}. ${p.n}</strong> — ${fmt(p.p)}<br>${p.b} · ${p.r}★`).join('<br><br>') +
+        `<br><em style="color:#94a3b8;font-size:12px">Demo Mode</em>`;
+    }},
+];
+
+let chatHistory = [];
+
+function initChat() {
+  chatHistory = [{
+    role: 'bot',
+    c: '👋 Hi! I\'m SmartCart AI, your intelligent shopping assistant.<br><br>I can help you:<br>● Find products within your budget<br>● Compare products side-by-side<br>● Get eco-friendly recommendations<br>● Understand price timing<br><br><em style="color:#94a3b8;font-size:12px">⚡ Demo Mode — IBM watsonx.ai not connected.</em>'
+  }];
+  renderChat();
+}
+
+function getBotReply(q) {
+  const ql = q.toLowerCase();
+  for (const rule of BOT_RULES) {
+    if (rule.keys.some(k => ql.includes(k))) return rule.fn();
+  }
+  const cats = ['smartphones','laptops','headphones','smartwatches','home_appliances'];
+  for (const c of cats) {
+    if (ql.includes(c.replace('_',' ')) || ql.includes(c.slice(0,-1))) {
+      const m = [...PRODUCTS].filter(p => p.c === c).sort((a,b) => b.val-a.val).slice(0,3);
+      return `Top ${c.replace('_',' ')} recommendations:<br><br>` +
+        m.map((p,i) => `<strong>${i+1}. ${p.n}</strong> — ${fmt(p.p)}<br>Value: ${p.val}/100 · Rating: ${p.r}★`).join('<br><br>') +
+        `<br><em style="color:#94a3b8;font-size:12px">Demo Mode</em>`;
+    }
+  }
+  return `I can help you with:<br>● Finding products within budget<br>● Best-in-category picks<br>● Eco-friendly recommendations<br>● Price timing advice<br><br>Try: <em>"Best 5G smartphone under ₹25,000"</em><br><em style="color:#94a3b8;font-size:12px">Demo Mode</em>`;
+}
+
+function renderChat() {
+  const box = document.getElementById('chat-box');
+  box.innerHTML = chatHistory.map(m =>
+    `<div class="chat-msg ${m.role==='user'?'user':''}">
+      <div class="chat-avatar" style="background:${m.role==='user'?'#3b82f6':'#f1f5f9'};font-size:12px">${m.role==='user'?'👤':'🤖'}</div>
+      <div class="bubble ${m.role==='user'?'user':'bot'}">${m.role==='user'?m.c.replace(/</g,'&lt;').replace(/>/g,'&gt;'):m.c}</div>
+    </div>`).join('');
+  box.scrollTop = box.scrollHeight;
+}
+
+function askBot(q) {
+  chatHistory.push({ role: 'user', c: q });
+  renderChat();
+  setTimeout(() => {
+    chatHistory.push({ role: 'bot', c: getBotReply(q) });
+    renderChat();
+  }, 520);
+}
+
+function sendChat() {
+  const inp = document.getElementById('chat-input');
+  const q = inp.value.trim();
+  if (!q) return;
+  inp.value = '';
+  askBot(q);
+}
+
+function clearChat() { chatHistory = []; initChat(); }
+
+function populateTrkSelect() {
+  const sel = document.getElementById('trk-product');
+  sel.innerHTML = '<option value="">Select product...</option>' +
+    PRODUCTS.map(p => `<option value="${p.id}">${p.n} (${fmt(p.p)})</option>`).join('');
+}
+
+function addTracker() {
+  const pid = document.getElementById('trk-product').value;
+  const target = parseFloat(document.getElementById('trk-target').value);
+  if (!pid) { toast('Please select a product', 'error'); return; }
+  if (!target || target <= 0) { toast('Please enter a valid target price', 'error'); return; }
+  const existing = trackedList.find(t => t.pid === pid);
+  if (existing) { existing.target = target; save(); renderTracker(); toast('Target price updated', 'success'); return; }
+  trackedList.push({ pid, target, at: new Date().toISOString() });
+  save(); renderTracker(); updateBadges();
+  const tc = document.getElementById('tracked-count');
+  if (tc) tc.textContent = trackedList.length;
+  toast(PRODUCTS.find(p=>p.id===pid).n + ' is now being tracked!', 'success');
+}
+
+function removeTracker(pid) {
+  trackedList = trackedList.filter(t => t.pid !== pid);
+  save(); renderTracker(); updateBadges();
+  const tc = document.getElementById('tracked-count');
+  if (tc) tc.textContent = trackedList.length;
+  toast('Removed from tracker', 'info');
+}
+
+function renderTracker() {
+  const el = document.getElementById('trk-list');
+  if (!trackedList.length) {
+    el.innerHTML = `<div class="empty-state card"><div class="es-icon">📉</div><div class="es-msg">No products tracked yet</div><div class="es-sub">Add a product above to start tracking</div></div>`;
+    return;
+  }
+  el.innerHTML = trackedList.map(t => {
+    const pr = PRODUCTS.find(p => p.id === t.pid);
+    if (!pr) return '';
+    const met = pr.p <= t.target;
+    const avg = pr.ph.reduce((s, v) => s + v, 0) / pr.ph.length;
+    const rec = met ? '✅ <strong>Buy Now</strong> — current price meets your target!'
+      : pr.p < avg ? '👍 <strong>Good time</strong> — price is below recent 6-month average.'
+      : '⏳ <strong>Consider waiting</strong> — price is above recent average.';
+    const phHtml = pr.ph.map((v, i) =>
+      `<div style="display:flex;align-items:center;gap:7px;margin-bottom:4px">
+        <span style="font-size:11px;color:#94a3b8;width:28px">${MONTHS[i]}</span>
+        <div class="pbar" style="flex:1"><div class="pfill" style="width:${Math.round(v/pr.o*100)}%;background:${v===pr.p?'#10b981':'#94a3b8'}"></div></div>
+        <span style="font-size:11.5px;font-weight:${v===pr.p?700:400};width:68px;text-align:right;color:${v===pr.p?'#10b981':'#475569'}">${fmt(v)}</span>
+      </div>`).join('');
+    return `<div class="card" style="margin-bottom:14px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px">
+        <div><div style="font-size:15px;font-weight:700">${pr.n}</div><div style="font-size:12px;color:#64748b;margin-top:2px">${pr.b}</div></div>
+        <button class="btn btn-r btn-xs" onclick="removeTracker('${t.pid}')">✕ Remove</button>
+      </div>
+      <div class="g3" style="margin-bottom:12px">
+        <div class="stat-card"><div style="font-size:11px;color:#64748b">Current Price</div><div style="font-size:18px;font-weight:800">${fmt(pr.p)}</div></div>
+        <div class="stat-card"><div style="font-size:11px;color:#64748b">Your Target</div><div style="font-size:18px;font-weight:800;color:${met?'#10b981':'#3b82f6'}">${fmt(t.target)}</div></div>
+        <div class="stat-card" style="background:${met?'#f0fdf4':'#fef3c7'}"><div style="font-size:11px;color:#64748b">Status</div><div style="font-size:13px;font-weight:700;color:${met?'#15803d':'#b45309'};margin-top:4px">${met?'🎯 Target Met!':'⏳ Tracking...'}</div></div>
+      </div>
+      <div style="background:#eff6ff;border-radius:9px;padding:10px 13px;margin-bottom:12px;font-size:13px;color:#1d4ed8">${rec}</div>
+      <div style="font-size:11.5px;font-weight:700;color:#64748b;margin-bottom:8px">PRICE HISTORY <span style="font-weight:400;color:#94a3b8;text-transform:none">(Demo — Synthetic)</span></div>
+      ${phHtml}
+    </div>`;
+  }).join('');
+}
+
+function quickTrack(id) {
+  const pr = PRODUCTS.find(p => p.id === id);
+  const ans = prompt(`Track: ${pr.n}\nCurrent price: ${fmt(pr.p)}\n\nEnter your target price (₹):`);
+  if (!ans) return;
+  const n = parseFloat(ans);
+  if (!n || n <= 0) { toast('Invalid price entered', 'error'); return; }
+  const existing = trackedList.find(t => t.pid === id);
+  if (existing) { existing.target = n; save(); toast('Target price updated to ' + fmt(n), 'success'); return; }
+  trackedList.push({ pid: id, target: n, at: new Date().toISOString() });
+  save(); updateBadges();
+  const tc = document.getElementById('tracked-count');
+  if (tc) tc.textContent = trackedList.length;
+  toast(`Tracking ${pr.n} — alert at ${fmt(n)}`, 'success');
+}
+
+function populateRevSelect() {
+  const sel = document.getElementById('rev-select');
+  if (sel.options.length > 1) return;
+  PRODUCTS.forEach(p => {
+    const o = document.createElement('option');
+    o.value = p.id; o.textContent = p.n;
+    sel.appendChild(o);
+  });
+}
+
+function loadReviews() {
+  const pid = document.getElementById('rev-select').value;
+  if (!pid) return;
+  const pr = PRODUCTS.find(p => p.id === pid);
+  const revs = pr.revs;
+  const pos = revs.filter(r => r.r >= 4).length;
+  const neu = revs.filter(r => r.r === 3).length;
+  const neg = revs.filter(r => r.r <= 2).length;
+  const tot = revs.length;
+  const allSame = new Set(revs.map(r => r.r)).size === 1 && tot > 1;
+  const suspHtml = allSame
+    ? `<div style="background:#fef3c7;border:1px solid #fde68a;border-radius:10px;padding:13px 15px;margin-bottom:14px">
+        <strong>⚠️ Potentially suspicious pattern detected</strong><br>
+        <span style="font-size:12.5px">All ${tot} reviews share identical rating. Heuristic flag only — does not confirm fake reviews. Note: these are synthetic demo reviews.</span>
+      </div>` : '';
+  document.getElementById('rev-content').innerHTML = `
+    ${suspHtml}
+    <div class="g2" style="margin-bottom:16px">
+      <div class="card">
+        <div class="section-title" style="margin-bottom:13px">Sentiment Distribution</div>
+        <div style="margin-bottom:9px">
+          <div style="display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:4px"><span>😊 Positive</span><strong style="color:#10b981">${pct(pos,tot)}%</strong></div>
+          <div class="pbar"><div class="pfill" style="width:${pct(pos,tot)}%;background:#10b981"></div></div>
+        </div>
+        <div style="margin-bottom:9px">
+          <div style="display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:4px"><span>😐 Neutral</span><strong style="color:#f59e0b">${pct(neu,tot)}%</strong></div>
+          <div class="pbar"><div class="pfill" style="width:${pct(neu,tot)}%;background:#f59e0b"></div></div>
+        </div>
+        <div>
+          <div style="display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:4px"><span>😞 Negative</span><strong style="color:#ef4444">${pct(neg,tot)}%</strong></div>
+          <div class="pbar"><div class="pfill" style="width:${pct(neg,tot)}%;background:#ef4444"></div></div>
+        </div>
+        <div style="margin-top:12px;font-size:11.5px;color:#94a3b8">Low confidence — only ${tot} sample reviews. Heuristic analysis only.</div>
+      </div>
+      <div class="card">
+        <div class="section-title" style="margin-bottom:11px">Common Themes</div>
+        <div style="font-size:12px;font-weight:700;color:#15803d;margin-bottom:6px">Positive</div>
+        <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:12px">
+          ${['Build quality','Performance','Value for money','Camera','Battery life'].map(t => `<span class="badge badge-green">${t}</span>`).join('')}
+        </div>
+        <div style="font-size:12px;font-weight:700;color:#dc2626;margin-bottom:6px">Negative</div>
+        <div style="display:flex;flex-wrap:wrap;gap:5px">
+          ${['No charger in box','Plastic build','Average call quality'].map(t => `<span class="badge badge-red">${t}</span>`).join('')}
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="section-title" style="margin-bottom:12px">Sample Reviews <span style="font-size:11px;font-weight:400;color:#94a3b8">(Demo — not real customer data)</span></div>
+      ${revs.map(rv => `
+        <div style="padding:11px 0;border-bottom:1px solid #f8fafc">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px">
+            <strong style="font-size:13px">${rv.a}</strong>
+            <span style="font-size:12px;color:#f59e0b">${stars(rv.r)} ${rv.r}/5</span>
+          </div>
+          <p style="font-size:13px;color:#374151;margin:0 0 6px">${rv.t}</p>
+          <div style="display:flex;gap:6px">
+            <span class="badge ${rv.v?'badge-green':'badge-gray'}">${rv.v?'✓ Verified':'Unverified'}</span>
+            <span class="badge badge-amber">Demo Review</span>
+          </div>
+        </div>`).join('')}
+    </div>`;
+}
+
+function renderPulse() {
+  const cats = ['smartphones','laptops','headphones','smartwatches','home_appliances'];
+  const lbl = { smartphones:'📱 Smartphones', laptops:'💻 Laptops', headphones:'🎧 Headphones', smartwatches:'⌚ Smartwatches', home_appliances:'🏠 Appliances' };
+  const cnt = cats.map(c => PRODUCTS.filter(p => p.c === c).length);
+  const avgP = cats.map(c => { const ps = PRODUCTS.filter(p => p.c === c); return Math.round(ps.reduce((s,p) => s+p.p,0) / ps.length); });
+  const maxCnt = Math.max(...cnt), maxP = Math.max(...avgP);
+  const totalSavings = PRODUCTS.reduce((s,p) => s+(p.o-p.p), 0);
+  const avgSust = Math.round(PRODUCTS.reduce((s,p) => s+p.sust,0) / PRODUCTS.length);
+  document.getElementById('pulse-stats').innerHTML = `
+    <div class="stat-card"><div style="font-size:22px;font-weight:800;color:#3b82f6">${PRODUCTS.length}</div><div style="font-size:12px;color:#64748b">Products Catalogued</div></div>
+    <div class="stat-card"><div style="font-size:22px;font-weight:800;color:#10b981">5</div><div style="font-size:12px;color:#64748b">Categories</div></div>
+    <div class="stat-card"><div style="font-size:22px;font-weight:800;color:#7c3aed">${avgSust}</div><div style="font-size:12px;color:#64748b">Avg Sustainability</div></div>
+    <div class="stat-card"><div style="font-size:22px;font-weight:800;color:#f59e0b">${fmt(totalSavings)}</div><div style="font-size:12px;color:#64748b">Savings Potential</div></div>`;
+  document.getElementById('pulse-cat').innerHTML = cats.map((c,i) =>
+    `<div style="margin-bottom:10px">
+      <div style="display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:4px"><span>${lbl[c]}</span><strong>${cnt[i]} products</strong></div>
+      <div class="pbar"><div class="pfill" style="width:${Math.round(cnt[i]/maxCnt*100)}%;background:#3b82f6"></div></div>
+    </div>`).join('');
+  document.getElementById('pulse-price').innerHTML = cats.map((c,i) =>
+    `<div style="margin-bottom:10px">
+      <div style="display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:4px"><span>${lbl[c]}</span><strong>${fmt(avgP[i])}</strong></div>
+      <div class="pbar"><div class="pfill" style="width:${Math.round(avgP[i]/maxP*100)}%;background:#7c3aed"></div></div>
+    </div>`).join('');
+  const top8 = [...PRODUCTS].sort((a, b) => b.val - a.val).slice(0, 8);
+  document.getElementById('pulse-val').innerHTML = top8.map((p, i) =>
+    `<div style="display:flex;align-items:center;gap:10px;margin-bottom:9px">
+      <span style="font-size:12px;font-weight:700;color:#94a3b8;width:20px">${i+1}</span>
+      <img src="${p.img}" style="width:28px;height:28px;object-fit:contain;border-radius:6px;border:1px solid #e2e8f0"/>
+      <div style="flex:1">
+        <div style="display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:3px">
+          <span style="font-weight:600">${p.n}</span>
+          <strong style="color:${i===0?'#f59e0b':i<3?'#7c3aed':'#3b82f6'}">${p.val}</strong>
+        </div>
+        <div class="pbar"><div class="pfill" style="width:${p.val}%;background:${i===0?'#f59e0b':i<3?'#7c3aed':'#3b82f6'}"></div></div>
+      </div>
+    </div>`).join('');
+  const bkts = [{l:'Low (0–40)',min:0,max:40,col:'#ef4444'},{l:'Mid (41–70)',min:41,max:70,col:'#f59e0b'},{l:'High (71–100)',min:71,max:100,col:'#10b981'}];
+  document.getElementById('pulse-sust').innerHTML = bkts.map(bk => {
+    const c = PRODUCTS.filter(p => p.sust>=bk.min && p.sust<=bk.max).length;
+    return `<div style="margin-bottom:10px">
+      <div style="display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:4px"><span>${bk.l}</span><strong>${c} products</strong></div>
+      <div class="pbar"><div class="pfill" style="width:${pct(c,PRODUCTS.length)}%;background:${bk.col}"></div></div>
+    </div>`;
+  }).join('');
+}
+
+function addToList(id) {
+  const pr = PRODUCTS.find(p => p.id === id);
+  if (!pr) return;
+  if (shoppingList.find(x => x.pid === id)) { toast('Already in your shopping list', 'info'); return; }
+  shoppingList.push({ pid: id, qty: 1, done: false });
+  save(); updateBadges();
+  const lc = document.getElementById('list-count');
+  if (lc) lc.textContent = shoppingList.length;
+  if (document.getElementById('pg-list').classList.contains('active')) renderList();
+  toast(pr.n + ' added to shopping list', 'success');
+}
+
+function removeFromList(id) {
+  shoppingList = shoppingList.filter(x => x.pid !== id);
+  save(); updateBadges(); renderList();
+  const lc = document.getElementById('list-count');
+  if (lc) lc.textContent = shoppingList.length;
+  toast('Removed from list', 'info');
+}
+
+function toggleListDone(id) {
+  const item = shoppingList.find(x => x.pid === id);
+  if (item) { item.done = !item.done; save(); renderList(); }
+}
+
+function listAutocomplete() {
+  const q = document.getElementById('list-search').value.toLowerCase();
+  const box = document.getElementById('list-dropdown');
+  if (!q) { box.style.display = 'none'; return; }
+  const hits = PRODUCTS.filter(p => (p.n + ' ' + p.b).toLowerCase().includes(q)).slice(0, 6);
+  if (!hits.length) { box.style.display = 'none'; return; }
+  box.innerHTML = hits.map(p =>
+    `<div style="padding:9px 13px;cursor:pointer;font-size:13px;border-bottom:1px solid #f8fafc;display:flex;justify-content:space-between"
+       onmouseenter="this.style.background='#f8fafc'" onmouseleave="this.style.background=''"
+       onclick="addToList('${p.id}');document.getElementById('list-search').value='';document.getElementById('list-dropdown').style.display='none'">
+      <span>${p.n}</span><span style="color:#94a3b8">${fmt(p.p)}</span>
+    </div>`).join('');
+  box.style.display = 'block';
+}
+
+function renderList() {
+  const budget = parseFloat(document.getElementById('budget-input').value) || 100000;
+  const el = document.getElementById('list-items');
+  if (!shoppingList.length) {
+    document.getElementById('list-stats').innerHTML = `
+      <div class="stat-card"><div style="font-size:11px;color:#64748b">Estimated Total</div><div style="font-size:20px;font-weight:800">${fmt(0)}</div></div>
+      <div class="stat-card"><div style="font-size:11px;color:#64748b">Budget Remaining</div><div style="font-size:20px;font-weight:800;color:#10b981">${fmt(budget)}</div></div>
+      <div class="stat-card"><div style="font-size:11px;color:#64748b">Purchased</div><div style="font-size:20px;font-weight:800;color:#10b981">0/0</div></div>`;
+    el.innerHTML = `<div class="empty-state card"><div class="es-icon">📋</div><div class="es-msg">Your shopping list is empty</div><div class="es-sub">Search for products above to add them</div></div>`;
+    return;
+  }
+  let total = 0, done = 0;
+  const cats = {};
+  shoppingList.forEach(item => {
+    const pr = PRODUCTS.find(p => p.id === item.pid);
+    if (!pr) return;
+    if (!cats[pr.c]) cats[pr.c] = [];
+    cats[pr.c].push({ item, pr });
+    if (!item.done) total += pr.p;
+    if (item.done) done++;
+  });
+  const rem = budget - total;
+  document.getElementById('list-stats').innerHTML = `
+    <div class="stat-card"><div style="font-size:11px;color:#64748b">Estimated Total</div><div style="font-size:20px;font-weight:800">${fmt(total)}</div></div>
+    <div class="stat-card"><div style="font-size:11px;color:#64748b">Budget Remaining</div><div style="font-size:20px;font-weight:800;color:${rem>=0?'#10b981':'#ef4444'}">${rem>=0?fmt(rem):'−'+fmt(-rem)}</div></div>
+    <div class="stat-card"><div style="font-size:11px;color:#64748b">Purchased</div><div style="font-size:20px;font-weight:800;color:#10b981">${done}/${shoppingList.length}</div></div>`;
+  const catLabel = { smartphones:'📱 Smartphones', laptops:'💻 Laptops', headphones:'🎧 Headphones', smartwatches:'⌚ Smartwatches', home_appliances:'🏠 Home Appliances' };
+  el.innerHTML = Object.entries(cats).map(([cat, items]) =>
+    `<div class="card" style="margin-bottom:14px">
+      <div style="font-weight:700;font-size:14px;color:#3b82f6;margin-bottom:12px">${catLabel[cat]||cat}</div>
+      ${items.map(({item, pr}) =>
+        `<div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid #f8fafc">
+          <input type="checkbox" ${item.done?'checked':''} onclick="toggleListDone('${item.pid}')" style="width:16px;height:16px;cursor:pointer;accent-color:#3b82f6"/>
+          <img src="${pr.img}" style="width:36px;height:36px;object-fit:contain;border-radius:8px;border:1px solid #e2e8f0" onerror="this.src='https://placehold.co/36x36/e2e8f0/94a3b8?text=P'"/>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:13.5px;font-weight:600;${item.done?'text-decoration:line-through;color:#94a3b8;':''}">${pr.n}</div>
+            <div style="font-size:12px;color:#64748b">${fmt(pr.p)} · ${pr.b}</div>
+          </div>
+          <button class="btn btn-r btn-xs" onclick="removeFromList('${item.pid}')">✕</button>
+        </div>`).join('')}
+    </div>`).join('');
+}
+
+function saveSettings() {
+  const b = document.getElementById('s-budget').value;
+  if (b) { document.getElementById('budget-input').value = b; }
+  toast('Preferences saved successfully!', 'success');
+}
+
+document.addEventListener('DOMContentLoaded', init);
+
+document.addEventListener('click', e => {
+  if (!e.target.closest('#cmp-input') && !e.target.closest('#cmp-dropdown'))
+    document.getElementById('cmp-dropdown').style.display = 'none';
+  if (!e.target.closest('#list-search') && !e.target.closest('#list-dropdown'))
+    document.getElementById('list-dropdown').style.display = 'none';
+});
+</script>
+</body>
+</html>
 
 ---
 
