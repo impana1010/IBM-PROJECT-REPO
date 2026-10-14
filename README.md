@@ -91,14 +91,7 @@ API docs available at **http://localhost:8000/docs**
 
 ### Frontend
 
-```bash
-cd smartcart/frontend
-
-npm install
-npm run dev
-```
-
-Frontend available at **martcart/index.html**
+Frontend available at **https://xxxxx.netlify.app**
 
 ---
 
