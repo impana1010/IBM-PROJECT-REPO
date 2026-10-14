@@ -90,7 +90,7 @@ uvicorn main:app --reload --port 8000
 API docs available at **http://localhost:8000/docs**
 
 ### Frontend
-
+https://github.com/impana1010/smartcart-ai/blob/main/index.html
 ---
 
 ## AI Modes
